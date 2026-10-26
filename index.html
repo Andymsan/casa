@@ -109,7 +109,7 @@ h3{font-size:14px;font-weight:600}
 @media(max-width:560px){.donde{grid-template-columns:1fr}#mapa{height:380px}}
 .tiles{filter:grayscale(1) contrast(.9) brightness(1.04) opacity(.72)}
 :root[data-tema="oscuro"] .tiles{filter:grayscale(1) invert(1) contrast(.8) brightness(.9) opacity(.8)}
-.leaflet-container{font-family:var(--fb);background:var(--bg)}
+.leaflet-container{font-family:var(--fb);background:var(--s2)}
 .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--card);color:var(--ink);border-radius:10px}
 .leaflet-popup-content{margin:10px 12px;font-size:13px;line-height:1.45}
 .leaflet-tooltip.metro{background:transparent;border:0;box-shadow:none;color:var(--ml);font-size:10.5px;font-weight:500;padding:0 0 0 4px;text-shadow:0 0 3px var(--bg),0 0 3px var(--bg)}
@@ -583,7 +583,7 @@ function showPanel(p){
   $$(".panel").forEach(x=>x.classList.toggle("on",x.id==="p-"+p));
   $$("#tabs .tab").forEach(t=>t.classList.toggle("on",t.dataset.p===p));
   if(location.hash!=="#"+p)history.replaceState(null,"","#"+p);
-  if(p==="mapa"&&map)setTimeout(()=>map.invalidateSize(),30);
+  if(p==="mapa"&&map)setTimeout(()=>{map.invalidateSize();if(!map._ajustado){map._ajustado=1;map.fitBounds(ZONA_VISTA,{padding:[16,16]})}},30);
   scrollTo({top:0});
 }
 function renderKpis(){
@@ -848,10 +848,13 @@ function calEvents(){
 const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 function mkMap(el,center,z){
   const m=L.map(el,{scrollWheelZoom:false}).setView(center,z);
-  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,className:"tiles",attribution:'&copy; OpenStreetMap'}).addTo(m);
+  const oscuro=document.documentElement.dataset.tema==="oscuro";
+  const esri=L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_${oscuro?"Dark":"Light"}_Gray_Base/MapServer/tile/{z}/{y}/{x}`,{maxZoom:16,attribution:"Esri, HERE, OpenStreetMap"}).addTo(m);
+  let fallos=0;esri.on("tileerror",()=>{if(++fallos===4){m.removeLayer(esri);L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,className:"tiles",attribution:"&copy; OpenStreetMap"}).addTo(m)}});
   return m;
 }
 let map=null,markers={},depaLayer=null;
+const ZONA_VISTA=[[19.4625,-99.2160],[19.4380,-99.1600]];
 const METRO=[["Cuatro Caminos",19.4596,-99.2159,"2"],["Panteones",19.4588,-99.2032,"2"],["Tacuba",19.4593,-99.1885,"2"],["Cuitláhuac",19.4573,-99.1813,"2"],["Popotla",19.4528,-99.1753,"2"],["Colegio Militar",19.4494,-99.1720,"2"],["Normal",19.4444,-99.1676,"2"],["San Cosme",19.4418,-99.1605,"2"],
   ["Refinería",19.4697,-99.1904,"7"],["Tacuba",19.4593,-99.1885,"7"],["San Joaquín",19.4457,-99.1917,"7"],["Polanco",19.4334,-99.1910,"7"],["Auditorio",19.4253,-99.1920,"7"],["Constituyentes",19.4120,-99.1915,"7"],["Tacubaya",19.4027,-99.1870,"7"],["Observatorio",19.3982,-99.2005,"1"]];
 function buildMap(){
@@ -864,7 +867,7 @@ function buildMap(){
   const work=(ll,c,html)=>L.circleMarker(ll,{radius:10,color:"#fff",weight:3,fillColor:c,fillOpacity:1}).bindPopup(html).addTo(map);
   work([19.4402,-99.1800],css("--verde"),"<b>SEMARNAT</b><br>Andrea");
   work([19.4587,-99.2128],css("--mandarina"),"<b>Herdez</b><br>Rafa");
-  map.fitBounds([[19.4625,-99.2160],[19.4380,-99.1600]],{padding:[16,16]});
+  map.fitBounds(ZONA_VISTA,{padding:[16,16]});
   depaLayer=L.layerGroup().addTo(map);
   renderMarkers();
 }
@@ -892,7 +895,10 @@ function bootUI(){
   $("#depaList").addEventListener("click",depaAction);
   $("#depaList").addEventListener("change",e=>{if(e.target.matches("[data-estado]"))ref.depas.doc(e.target.closest(".depa").dataset.id).update({estado:e.target.value})});
   $("#depaList").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.matches("[data-cm]")){const c=e.target.closest(".depa");sendCm(c,S.depas.find(x=>x.id===c.dataset.id))}});
-  addEventListener("apariencia",()=>{calKey="";renderCal()});
+  addEventListener("apariencia",()=>{calKey="";renderCal();
+    map.remove();map=null;depaLayer=null;buildMap();
+    if(miniMap){miniMap.remove();miniMap=null;miniPin=null}
+    if($("#p-mapa").classList.contains("on"))setTimeout(()=>map.invalidateSize(),30)});
   showPanel(location.hash.slice(1)||"inicio");
   fillInputs();renderCalc();renderDepas();renderPend();renderCasa();renderCal();renderKpis();
 }
