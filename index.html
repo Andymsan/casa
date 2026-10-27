@@ -182,6 +182,34 @@ textarea{min-height:76px;resize:vertical}
 .escs .pill.on{background:var(--rafa);border-color:var(--rafa);color:var(--hoja)}
 .chk{display:flex;gap:10px;align-items:center;font-size:15.7px;color:var(--tinta2);padding:8px 0;cursor:pointer}
 .chk input{accent-color:var(--andrea);width:16px;height:16px}
+.ppto{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;align-items:start;margin-top:24px}
+@media(min-width:1500px){.ppto{grid-template-columns:minmax(0,1.5fr) minmax(340px,.6fr)}}
+.ppto h3{font-size:30px;margin-bottom:6px}
+.ppto .intro{font-size:15.7px;color:var(--tinta2);margin:0 0 14px}
+.pg h4{font-weight:400;font-size:13.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--barro);margin:20px 0 2px}
+.pf{display:grid;grid-template-columns:minmax(0,1fr) 128px 74px 88px 88px 26px;grid-template-areas:"n m t a r x";gap:10px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--linea)}
+.pf .pn{grid-area:n;min-width:0}.pf .pm{grid-area:m}.pf .ptp{grid-area:t}.pf .pa{grid-area:a}.pf .pr{grid-area:r}.pf .px{grid-area:x}
+.pf input.pn{border-color:transparent;background:transparent;padding:6px 8px;margin-left:-8px}
+.pf input.pn:hover{border-color:var(--linea)}
+.pf .pn small{display:block;font-size:13px;color:var(--suave)}
+.pf .pm input{padding-top:6px;padding-bottom:6px}
+.pf .n,.pf .pa,.pf .pr,.pf span.pm{text-align:right;font-family:var(--mono);font-size:15px}
+.pf.head{border-bottom:1px solid var(--linea);padding-bottom:8px}
+.pf.head span{font-family:var(--sans);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta2)}
+.tipo{border:0;border-radius:99px;font-size:12.5px;padding:4px 9px;cursor:pointer;background:var(--andrea-s);color:var(--tinta)}
+.tipo.gusto{background:var(--papaya-s)}.tipo.ahorro{background:var(--rafa-s);cursor:default}
+.pf .px{background:none;border:0;color:var(--suave);font-size:20px;line-height:1;cursor:pointer;padding:0}
+.pg .lnk{margin-top:8px}
+@media(max-width:620px){
+  .pf{grid-template-columns:auto minmax(0,1fr) 112px 22px;grid-template-areas:"n n m x" "t a r r";row-gap:4px;column-gap:8px}
+  .pf.head{display:none}.pf .ptp{justify-self:start}.pf .pa,.pf .pr{font-size:13px;white-space:nowrap}.pf .pa{text-align:left}
+  .pf .pa:before{content:"Andrea "}.pf .pr:before{content:"Rafa "}
+}
+.prog{height:10px;border-radius:99px;background:var(--papel2);overflow:hidden;margin:16px 0 6px}
+.prog i{display:block;height:100%;background:var(--andrea);border-radius:inherit}
+.fondo .escs{margin:0;justify-content:flex-end;flex-wrap:nowrap}
+.fondo .escs .pill.on{background:var(--tinta);border-color:var(--tinta);color:var(--hoja)}
+.fondo .fl{grid-template-columns:1fr minmax(150px,210px)}
 .aviso{background:var(--rafa-s);border-radius:14px;padding:12px 14px;font-size:15.7px;margin-bottom:14px}
 .cifras{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:26px}
 .cifra{border:1px solid var(--linea);border-radius:18px;padding:14px 16px}
@@ -596,6 +624,23 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
         <div id="cRes"></div>
       </div>
     </div>
+    <div class="ppto">
+      <div class="hoja">
+        <h3>El presupuesto de los dos</h3>
+        <p class="intro">Solo lo de la casa y lo que hacen juntos. Lo de cada quien (celular, gym, terapia, suscripciones propias, transporte) sigue en su propio presupuesto.</p>
+        <div class="pf head"><span class="pn">Al mes</span><span class="pm">Monto</span><span class="ptp">Tipo</span><span class="pa cA">Andrea</span><span class="pr cR">Rafa</span><span></span></div>
+        <div id="pptoCuerpo"></div>
+        <div id="pptoTot"></div>
+      </div>
+      <div class="hoja datos fondo">
+        <h3>Fondo de emergencia</h3>
+        <p class="intro">Para lo que no se planea: salud, quedarse sin trabajo, una reparación urgente. Va en una cuenta aparte que se pueda sacar el mismo día, y no se toca para otra cosa.</p>
+        <div class="fl"><span>Que alcance para</span><div class="escs" id="fMeses"><button class="pill" data-meses="3">3 meses</button><button class="pill" data-meses="6">6 meses</button></div></div>
+        <div class="fl"><span>Ya guardado</span><div class="money"><input type="number" min="0" step="100" id="fGuardado"></div></div>
+        <div class="fl" style="border-bottom:0"><span>Aportan al mes<small>los dos juntos</small></span><div class="money"><input type="number" min="0" step="100" id="fAporte"></div></div>
+        <div id="fondoRes"></div>
+      </div>
+    </div>
   </section>
 
   <!-- Depas -->
@@ -805,7 +850,20 @@ const ref={
   diario:fdb.collection("casa").doc("hogar").collection("diario")
 };
 
-const DEFAULT_CONFIG={ingA:0,ingR:0,valesR:0,contarVales:false,rentaActual:0,rentaIdeal:16000,servicios:2000,poliza:5000,depositoMeses:1,ahorrado:0,fechaMeta:"2027-02-01",calendarios:[]};
+const DEFAULT_CONFIG={ingA:0,ingR:0,valesR:0,contarVales:false,rentaActual:0,rentaIdeal:16000,servicios:2000,poliza:5000,depositoMeses:1,ahorrado:0,fechaMeta:"2027-02-01",calendarios:[],
+  /* montos de arranque para dos personas; se ajustan en Gastos y se guardan cifrados */
+  presupuesto:[
+    {id:"renta",cat:"Casa",nombre:"Renta",auto:"renta",tipo:"basico"},
+    {id:"servicios",cat:"Casa",nombre:"Servicios",auto:"servicios",tipo:"basico"},
+    {id:"despensa",cat:"Comida",nombre:"Despensa",monto:5000,tipo:"basico"},
+    {id:"salidas",cat:"Comida",nombre:"Salidas y restaurantes juntos",monto:2000,tipo:"gusto"},
+    {id:"limpieza",cat:"Hogar",nombre:"Limpieza y cosas de la casa",monto:600,tipo:"basico"},
+    {id:"arreglos",cat:"Hogar",nombre:"Muebles y arreglos",monto:500,tipo:"gusto"},
+    {id:"streaming",cat:"Los dos",nombre:"Streaming compartido",monto:300,tipo:"gusto"},
+    {id:"escapadas",cat:"Los dos",nombre:"Viajes y escapadas",monto:1000,tipo:"gusto"},
+    {id:"fondo",cat:"Ahorro",nombre:"Fondo de emergencia",auto:"fondo",tipo:"ahorro"}
+  ],
+  fondo:{meses:3,guardado:0,aporte:2000}};
 
 const mkDepa=(id,o)=>({id,estado:"visitar",votos:{},comentarios:[],luz:"",elevador:"",cajon:"",mascotas:"",balcon:"",cocina:"",recamaras:null,piso:"",incluye:"",poliza:null,...o});
 const SEED_DEPAS=[
@@ -963,7 +1021,7 @@ async function parchar(){
 
 function setSync(ok){$("#sync").innerHTML=`<i class="punto ${ok?"":"off"}"></i>${ok?"en la nube":"guardando"}`}
 /* lo personal de config (sueldos, renta de hoy, ahorro) se guarda cifrado */
-const PRIV=["ingA","ingR","valesR","escRafa","escAndrea","rentaActual","ahorrado"];
+const PRIV=["ingA","ingR","valesR","escRafa","escAndrea","rentaActual","ahorrado","presupuesto","fondo"];
 async function guardarConfig(obj){
   const pub={};let priv=false;
   for(const [k,v] of Object.entries(obj)){if(PRIV.includes(k))priv=true;else pub[k]=v}
@@ -980,7 +1038,7 @@ async function aplicarConfig(raw){
   else if(!(S.config.calAuto||{})[S.quien]&&!S.config.calendarios.some(c=>c.de===S.quien)&&S.email&&/@gmail\.com$/i.test(S.email))
     ref.config.set({calendarios:[...S.config.calendarios,{id:S.email,nombre:"Personal",de:S.quien,color:S.quien==="rafa"?"#F4511E":"#0B8043"}],calAuto:{...(S.config.calAuto||{}),[S.quien]:true}},{merge:true});
   quitarFermic();
-  fillInputs();fillEsc();fillEscA();renderCalc();renderDepas();renderMarkers();renderCal();renderInicio();
+  fillInputs();fillEsc();fillEscA();renderCalc();renderPpto();renderDepas();renderMarkers();renderCal();renderInicio();
   if(S.booted)pintarLlave();
   /* lo que todavía esté sin cifrar en la nube se cifra y se borra */
   if(LLAVE&&PRIV.some(k=>raw[k]!==null&&raw[k]!==undefined))guardarConfig(Object.fromEntries(PRIV.map(k=>[k,S.config[k]])));
@@ -1349,6 +1407,7 @@ function bindInputs(){
   }));
 }
 function renderCalc(){
+  renderPptoTot();
   const c=S.config,sh=shares(),t=tope(),ideal=+c.rentaIdeal||16000;
   if(rentaSim===null)rentaSim=ideal;
   const r=rentaSim,sv=+c.servicios||0,e=entrada(r,null),meses=mesesHasta();
@@ -1378,6 +1437,82 @@ function renderCalc(){
       return `<tr><td>${esc(oa.nombre||"Sin nombre")} · ${esc(o.nombre||"Sin nombre")}</td><td>${mx((r+sv)*fa)}</td><td>${mx((r+sv)*(1-fa))}</td><td>${pct((r+sv)/tot)}</td></tr>`})).join("")}</table>
     <div class="nota">Al mes, con renta de ${mx(r)} más servicios. En todas, los dos ponen el mismo porcentaje de lo que ganan.</div>`:""}
     <div class="nota">${falta<=0?"La entrada ya está completa.":meses>0?`Faltan ${mx(falta)} y quedan ${meses} ${meses===1?"mes":"meses"}: <span class="cA">Andrea guarda ${mx(falta*ra/meses)}</span> y <span class="cR">Rafa ${mx(falta*rr/meses)}</span> al mes.`:`Faltan ${mx(falta)}.`}</div>`;
+}
+
+/* ---------- Presupuesto de los dos y fondo de emergencia ----------
+   Cada quien pone el mismo porcentaje de lo que gana, igual que en la renta. */
+const CATS_P=["Casa","Comida","Hogar","Los dos","Ahorro"];
+const ppto=()=>Array.isArray(S.config.presupuesto)?S.config.presupuesto:DEFAULT_CONFIG.presupuesto;
+const fondo=()=>({...DEFAULT_CONFIG.fondo,...(S.config.fondo||{})});
+function montoP(x){
+  if(x.auto==="renta")return rentaSim??(+S.config.rentaIdeal||0);
+  if(x.auto==="servicios")return +S.config.servicios||0;
+  if(x.auto==="fondo")return +fondo().aporte||0;
+  return +x.monto||0;
+}
+const NOTA_AUTO={renta:"la de la cuenta de arriba",servicios:"luz, gas, internet y agua",fondo:"lo que aportan, aquí al lado"};
+const TIPO_P={basico:"Básico",gusto:"Gusto",ahorro:"Ahorro"};
+function pptoFila(x){
+  const t=`<button class="tipo ptp ${x.tipo}" ${x.auto?"disabled":`data-tipo title="Cambiar entre básico y gusto"`}>${TIPO_P[x.tipo]||"Básico"}</button>`;
+  return `<div class="pf" data-id="${esc(x.id)}">${x.auto
+    ?`<span class="pn">${esc(x.nombre)}<small>${NOTA_AUTO[x.auto]}</small></span><span class="pm">${mx(montoP(x))}</span>${t}`
+    :`<input type="text" class="pn" data-f="nombre" value="${esc(x.nombre)}" placeholder="Concepto" aria-label="Concepto"><div class="money pm"><input type="number" min="0" step="100" data-f="monto" value="${+x.monto||""}" aria-label="Al mes"></div>${t}`}
+    <span class="pa"></span><span class="pr"></span>${x.auto?"<span class=\"px\"></span>":`<button class="px" data-del aria-label="Quitar">×</button>`}</div>`;
+}
+function renderPpto(){
+  const box=$("#pptoCuerpo");if(!box)return;
+  if(!box.contains(document.activeElement)||!box.children.length){
+    const l=ppto();
+    box.innerHTML=CATS_P.map(c=>{const fs=l.filter(x=>(x.cat||"Los dos")===c);if(!fs.length&&c==="Ahorro")return"";
+      return `<div class="pg"><h4>${c}</h4>${fs.map(pptoFila).join("")}${c==="Ahorro"?"":`<button class="lnk" data-add="${c}">+ agregar a ${c}</button>`}</div>`}).join("");
+  }
+  const f=fondo();$$("#fMeses [data-meses]").forEach(b=>b.classList.toggle("on",+b.dataset.meses===+f.meses));
+  [["#fGuardado","guardado"],["#fAporte","aporte"]].forEach(([q,k])=>{const i=$(q);if(i!==document.activeElement)i.value=+f[k]||""});
+  renderPptoTot();
+}
+function renderPptoTot(){
+  const box=$("#pptoCuerpo");if(!box)return;if(!box.children.length)return renderPpto();
+  const sh=shares(),ing=ingresos(),l=ppto(),suma=t=>l.filter(x=>!t||x.tipo===t).reduce((a,x)=>a+montoP(x),0);
+  l.forEach(x=>{const row=box.querySelector(`[data-id="${CSS.escape(x.id)}"]`);if(!row)return;const m=montoP(x);
+    row.querySelector(".pa").textContent=mx(m*sh.a);row.querySelector(".pr").textContent=mx(m*sh.r);
+    if(x.auto)row.querySelector("span.pm").textContent=mx(m)});
+  const tot=suma(),fila=(n,v,cls="")=>`<tr class="${cls}"><td>${n}</td><td>${mx(v*sh.a)}</td><td>${mx(v*sh.r)}</td><td>${mx(v)}</td></tr>`;
+  const ingT=ing.a+ing.r;
+  $("#pptoTot").innerHTML=`<table class="t"><tr><th></th><th class="cA">Andrea</th><th class="cR">Rafa</th><th>Total</th></tr>
+    ${fila("Básicos",suma("basico"))}${fila("Gustos",suma("gusto"))}${fila("Ahorro",suma("ahorro"))}${fila("Al mes",tot,"tot")}</table>
+    <div class="nota">${ingT?`Es el ${pct(tot/ingT)} de lo que ganan. A cada quien le queda para lo suyo: <span class="cA">Andrea ${mx(ing.a-tot*sh.a)}</span> y <span class="cR">Rafa ${mx(ing.r-tot*sh.r)}</span>.`:"Con los ingresos de arriba, aquí sale lo que pone cada quien."}</div>`;
+  /* fondo: meses de gastos básicos */
+  const f=fondo(),bas=suma("basico"),meta=bas*(+f.meses||3),g=+f.guardado||0,ap=+f.aporte||0,falta=Math.max(0,meta-g);
+  let cuando="";
+  if(falta<=0&&meta>0)cuando="El fondo ya está completo. Lo que aporten de más puede ir a otro ahorro.";
+  else if(ap>0){const n=Math.ceil(falta/ap),d=new Date();d.setMonth(d.getMonth()+n);cuando=`Con ${mx(ap)} al mes se completa en ${n} ${n===1?"mes":"meses"}, por ${d.toLocaleDateString("es-MX",{month:"long",year:"numeric"})}.`}
+  else cuando="Pongan cuánto aportan al mes para saber cuándo se completa.";
+  $("#fondoRes").innerHTML=`<div class="cifra" style="margin-top:14px"><span>Meta</span><b class="n">${mx(meta)}</b><small>${f.meses||3} meses de básicos (${mx(bas)} al mes)</small></div>
+    <div class="prog"><i style="width:${meta?Math.min(100,g/meta*100):0}%"></i></div>
+    <div class="nota" style="margin-top:0">${meta?`${pct(Math.min(1,g/meta))} guardado. `:""}${cuando}</div>
+    ${ap?`<div class="nota">Al mes: <span class="cA">Andrea ${mx(ap*sh.a)}</span> y <span class="cR">Rafa ${mx(ap*sh.r)}</span>.</div>`:""}`;
+}
+let pptoT=null;
+function guardarPpto(l,f){
+  if(l)S.config.presupuesto=l;if(f)S.config.fondo=f;
+  clearTimeout(pptoT);pptoT=setTimeout(()=>{setSync(false);guardarConfig({presupuesto:ppto(),fondo:fondo()})},600);
+}
+function pptoEvents(){
+  const box=$("#pptoCuerpo");
+  box.addEventListener("input",e=>{const i=e.target.closest("[data-f]"),row=e.target.closest("[data-id]");if(!i||!row)return;
+    const k=i.dataset.f,v=k==="monto"?(+i.value||0):i.value;
+    guardarPpto(ppto().map(x=>x.id===row.dataset.id?{...x,[k]:v}:x));renderPptoTot()});
+  box.addEventListener("click",e=>{
+    const row=e.target.closest("[data-id]"),add=e.target.closest("[data-add]");
+    if(add){const id="p"+Date.now();guardarPpto([...ppto(),{id,cat:add.dataset.add,nombre:"",monto:0,tipo:"basico"}]);document.activeElement.blur();renderPpto();
+      const n=box.querySelector(`[data-id="${id}"] input.pn`);n&&n.focus();return}
+    if(!row)return;
+    if(e.target.closest("[data-tipo]")){guardarPpto(ppto().map(x=>x.id===row.dataset.id?{...x,tipo:x.tipo==="gusto"?"basico":"gusto"}:x));document.activeElement.blur();renderPpto();return}
+    if(e.target.closest("[data-del]")){const x=ppto().find(y=>y.id===row.dataset.id);if(!confirm(`¿Quitar "${x.nombre||"este gasto"}" del presupuesto?`))return;
+      guardarPpto(ppto().filter(y=>y.id!==row.dataset.id));document.activeElement.blur();renderPpto()}
+  });
+  $("#fMeses").addEventListener("click",e=>{const b=e.target.closest("[data-meses]");if(!b)return;guardarPpto(null,{...fondo(),meses:+b.dataset.meses});renderPpto()});
+  [["#fGuardado","guardado"],["#fAporte","aporte"]].forEach(([q,k])=>$(q).addEventListener("input",ev=>{guardarPpto(null,{...fondo(),[k]:+ev.target.value||0});renderPptoTot()}));
 }
 
 /* ---------- Opciones de Rafa ---------- */
@@ -1747,7 +1882,7 @@ function bootUI(){
   const opt=o=>Object.entries(o).map(([k,v])=>`<option value="${k}">${v}</option>`).join("");
   ["luz","elevador","cajon","mascotas","balcon","cocina"].forEach(k=>$("#dForm").elements[k].innerHTML=opt(SINO));
   $("#dForm").elements.estado.innerHTML=opt(ESTADOS);
-  bindInputs();escEvents();escEventsA();cartaEvents();presEvents();llaveEvents();chatEvents();diarioEvents();notiEvents();deseoEvents();listEvents();calEvents();buildMap();lugaresEvents();
+  bindInputs();pptoEvents();escEvents();escEventsA();cartaEvents();presEvents();llaveEvents();chatEvents();diarioEvents();notiEvents();deseoEvents();listEvents();calEvents();buildMap();lugaresEvents();
   $("#rentRange").addEventListener("input",ev=>{rentaSim=+ev.target.value;renderCalc()});
   $("#tabs").addEventListener("click",e=>{const t=e.target.closest(".tab");if(t)showPanel(t.dataset.p)});
   addEventListener("hashchange",()=>showPanel(location.hash.slice(1)));
