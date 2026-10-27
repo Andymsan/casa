@@ -456,6 +456,7 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
         <div class="fl"><span>Nombre</span><input type="text" id="escNom" placeholder="Trabajo actual"></div>
         <div class="fl"><span>Neto al mes</span><div class="money"><input type="number" min="0" step="100" id="escNeto"></div></div>
         <div class="fl"><span>Vales</span><div class="money"><input type="number" min="0" step="100" id="escVales"></div></div>
+        <div class="fl"><span>Trabaja en</span><select id="escLugar"><option value="fermic">Fermic</option><option value="herdez">Herdez</option></select></div>
         <label class="chk"><input type="checkbox" data-k="contarVales"> Contar los vales</label>
         <button class="lnk" id="escDel" style="margin-bottom:4px">Quitar esta opción</button>
         <h4>Renta</h4>
@@ -568,6 +569,7 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
     </div>
     <div class="g2">
       <label class="f"><span>Traslado de Andrea</span><input type="text" name="trasladoA"></label>
+      <label class="f"><span>Traslado de Rafa a Fermic</span><input type="text" name="trasladoF"></label>
       <label class="f"><span>Traslado de Rafa a Herdez</span><input type="text" name="trasladoR"></label>
     </div>
     <div class="g2">
@@ -656,13 +658,22 @@ const SEED_PEND=[
 
 
 /* Correcciones con datos de los anuncios (oct 2026); se aplican una sola vez a lo que ya está en la nube */
-const PARCHE=1;
+const PARCHE=2;
 const PARCHE_DEPAS={
   "lago-mayor-30":{recamaras:2,piso:"2",lat:19.4510,lng:-99.1866,pros:["2 recámaras con clóset","Elevador","Cajón techado","Acepta perros y gatos","Balcón interior","Frente a un mercado","Vigilancia 24/7"],contras:["Un solo baño"]},
   "cedro-62":{recamaras:2,lat:19.4495,lng:-99.1615,pros:["La colonia favorita de Andrea","2 recámaras, 65 m²","Cocina integral con parrilla y campana","Metro Normal, Línea 2 directa a Cuatro Caminos"],contras:["Sin estacionamiento"]},
   "golfo-san-lorenzo-28":{recamaras:2,foto:"https://http2.mlstatic.com/D_NQ_NP_945806-MLM118136433551_092026-O-departamento-cerca-del-metro-tacuba.webp",pros:["La más barata de Tacuba","2 recámaras","Cajón","Cocina integral"],contras:["3er piso sin elevador","Da hacia adentro: revisar la luz","No acepta mascotas"]},
   "golfo-de-riga":{recamaras:2,piso:"PB",luz:"si",foto:"https://http2.mlstatic.com/D_NQ_NP_865721-MLM119942831035_102026-O-departamento-en-renta-en-mexico-tacuba.webp",pros:["Muy iluminado, según el anuncio","2 recámaras, 65 m²","Incluye agua y mantenimiento","Roof garden","Lavado dentro del depa"],contras:["Planta baja","Sin cajón ni elevador","No acepta mascotas"]},
   "golfo-de-california-32":{recamaras:2,piso:"2",pros:["2 recámaras","Elevador","Cajón","Acepta perros y gatos","Póliza de $7,796 a medias con la dueña"],contras:["Arriba de la renta ideal","Contrato de un año"]}
+};
+/* Parche 2: Rafa trabaja hoy en Fermic (Granjas Estrella, Iztapalapa); tiempos en metro, aprox. */
+const PARCHE_DEPAS2={
+  "lago-mayor-30":{trasladoF:"1 h 15 min, Línea 2 y Línea 8, aprox."},
+  "cedro-62":{trasladoF:"1 h 10 min, Línea 2 y Línea 8, aprox."},
+  "golfo-san-lorenzo-28":{trasladoF:"1 h 20 min, Línea 2 y Línea 8, aprox."},
+  "golfo-de-riga":{trasladoF:"1 h 20 min, Línea 2 y Línea 8, aprox."},
+  "golfo-de-california-32":{trasladoF:"1 h 20 min, Línea 2 y Línea 8, aprox."},
+  "observatorio-homie":{trasladoF:"1 h 15 min, Línea 7, Línea 1 y Línea 8, aprox."}
 };
 
 const S={uid:null,quien:null,config:{...DEFAULT_CONFIG},depas:[],pend:[],cosas:[],deseos:null,filtro:"activos",casaTab:"despensa",calModo:"WEEK",calColor:GCOLORES[0],unsub:[],booted:false};
@@ -719,7 +730,7 @@ async function seed(){
     if(c.exists)return;
     const b=fdb.batch();
     b.set(ref.config,{...DEFAULT_CONFIG,parche:PARCHE,creado:Date.now()});
-    SEED_DEPAS.forEach((d,i)=>{const {id,...rest}=d;b.set(ref.depas.doc(id),{...rest,...(PARCHE_DEPAS[id]||{}),creadoPor:"andrea",creado:Date.now()+i})});
+    SEED_DEPAS.forEach((d,i)=>{const {id,...rest}=d;b.set(ref.depas.doc(id),{...rest,...(PARCHE_DEPAS[id]||{}),...(PARCHE_DEPAS2[id]||{}),creadoPor:"andrea",creado:Date.now()+i})});
     SEED_PEND.forEach(([texto,cat,nota],i)=>b.set(ref.pend.doc("p"+i),{texto,cat,nota,hecho:false,por:"andrea",creado:Date.now()+i}));
     await b.commit();
   }catch(e){console.warn("seed",e)}
@@ -729,8 +740,10 @@ async function parchar(){
     const d=(await ref.config.get()).data()||{};
     const upd={};
     if((d.parche||0)<PARCHE){
+      /* cada parche se aplica una vez, para no pisar lo que ya se editó */
       const b=fdb.batch();
-      for(const [id,o] of Object.entries(PARCHE_DEPAS)){if((await ref.depas.doc(id).get()).exists)b.update(ref.depas.doc(id),o)}
+      for(const [n,lote] of [[1,PARCHE_DEPAS],[2,PARCHE_DEPAS2]])if((d.parche||0)<n)
+        for(const [id,o] of Object.entries(lote)){if((await ref.depas.doc(id).get()).exists)b.update(ref.depas.doc(id),o)}
       await b.commit();upd.parche=PARCHE;
     }
     /* antes los calendarios eran {andrea:correo, rafa:correo}; ahora son una lista */
@@ -885,11 +898,20 @@ function renderCalc(){
 
 /* ---------- Opciones de Rafa ---------- */
 let escT=null;
+/* dónde trabaja Rafa en cada opción; de eso salen los traslados y el mapa */
+function lugarDe(e){return e.lugar||(/herdez/i.test(e.nombre||"")?"herdez":"fermic")}
+function pintarLugares(){
+  if(!LUGARES.fermic)return;const act=lugarDe(escActual());
+  for(const k of ["fermic","herdez"]){const on=k===act;LUGARES[k].setStyle({color:on?"#fff":css("--rafa"),fillColor:on?css("--rafa"):css("--hoja")});
+    const pt=document.querySelector(`[data-lugar=${k}] .pt`);pt.style.background=on?"var(--rafa)":"transparent";pt.style.border=on?"0":"2px solid var(--rafa)"}
+}
 function fillEsc(){
   const l=escs(),a=escActual();
   $("#escs").innerHTML=l.map(e=>`<button class="pill ${e.id===a.id?"on":""}" data-e="${e.id}">${esc(e.nombre||"Sin nombre")}</button>`).join("")+`<button class="pill" data-e="nuevo">+ Otra opción</button>`;
   [["#escNom","nombre"],["#escNeto","neto"],["#escVales","vales"]].forEach(([q,k])=>{const i=$(q);if(i!==document.activeElement)i.value=k==="nombre"?(a[k]||""):(+a[k]||"")});
+  $("#escLugar").value=lugarDe(a);
   $("#escDel").classList.toggle("hide",l.length<2);
+  pintarLugares();
 }
 function guardarEsc(l,activo){
   S.config.escRafa=l;S.config.escActivo=activo;const a=escActual();S.config.ingR=+a.neto||0;S.config.valesR=+a.vales||0;
@@ -902,6 +924,7 @@ function escEvents(){
     else guardarEsc(escs(),b.dataset.e)});
   [["#escNom","nombre"],["#escNeto","neto"],["#escVales","vales"]].forEach(([q,k])=>$(q).addEventListener("input",ev=>{
     const a=escActual(),l=escs().map(e=>e.id===a.id?{...e,[k]:k==="nombre"?ev.target.value:(+ev.target.value||0)}:e);guardarEsc(l,a.id)}));
+  $("#escLugar").addEventListener("change",ev=>{const a=escActual();guardarEsc(escs().map(e=>e.id===a.id?{...e,lugar:ev.target.value}:e),a.id)});
   $("#escDel").onclick=()=>{const a=escActual();if(!confirm(`¿Quitar la opción "${a.nombre||"sin nombre"}"?`))return;const l=escs().filter(e=>e.id!==a.id);guardarEsc(l,l[0].id)};
 }
 
@@ -913,7 +936,7 @@ function arcoVacio(d){
 }
 function fotoFalla(img){const box=img.parentNode;img.remove();box.insertAdjacentHTML("afterbegin",arcoVacio({id:box.closest(".depa").dataset.id}))}
 function tagSiNo(v,si,no,q){return v==="si"?`<span class="eti ok">${si}</span>`:v==="no"?`<span class="eti no">${no}</span>`:q?`<span class="eti q">${q}</span>`:""}
-function depaCard(d){
+function depaCard(d){const lu=lugarDe(escActual());
   const sh=shares(),r=+d.renta||0,sv=+S.config.servicios||0,e=entrada(r,d.poliza),[cls,lbl]=rentaStatus(r);
   const vot=d.votos||{},list=a=>(a||[]).filter(Boolean).map(x=>`<li>${esc(x)}</li>`).join("")||`<li class="suave" style="list-style:none;margin-left:-16px">—</li>`;
   const rec=d.recamaras;
@@ -949,7 +972,7 @@ function depaCard(d){
       <div class="etis">${tags}</div>
       <dl class="kv">
         <dt>Andrea</dt><dd>${esc(d.trasladoA)||"—"}</dd>
-        <dt>Rafa, a Herdez</dt><dd>${esc(d.trasladoR)||"—"}</dd>
+        <dt>Rafa, a ${lu==="herdez"?"Herdez":"Fermic"}</dt><dd>${esc(lu==="herdez"?d.trasladoR:d.trasladoF)||"—"}</dd>
         <dt>Entrada</dt><dd class="n">${mx(e.total)}</dd>
       </dl>
       <div class="pc"><div><span class="cap p">A favor</span><ul>${list(d.pros)}</ul></div><div><span class="cap c">En contra</span><ul>${list(d.contras)}</ul></div></div>
@@ -1001,7 +1024,7 @@ function openDlg(d){
   editing=d;const f=$("#dForm");f.reset();
   $("#dTitle").textContent=d?"Editar depa":"Nuevo depa";
   const v=d||{estado:"visitar"};
-  ["nombre","colonia","metros","renta","m2","recamaras","incluye","poliza","piso","luz","elevador","cajon","mascotas","balcon","cocina","estado","trasladoA","trasladoR","link","foto"].forEach(k=>{f.elements[k].value=v[k]??""});
+  ["nombre","colonia","metros","renta","m2","recamaras","incluye","poliza","piso","luz","elevador","cajon","mascotas","balcon","cocina","estado","trasladoA","trasladoF","trasladoR","link","foto"].forEach(k=>{f.elements[k].value=v[k]??""});
   f.elements.pros.value=(v.pros||[]).join("\n");f.elements.contras.value=(v.contras||[]).join("\n");
   $("#dlg").showModal();
   const ll=[v.lat||19.452,v.lng||-99.180];
@@ -1013,7 +1036,7 @@ $("#dCancel").onclick=()=>$("#dlg").close();
 $("#dForm").onsubmit=ev=>{
   ev.preventDefault();const f=ev.target,g=k=>f.elements[k].value.trim(),n=k=>g(k)===""?null:+g(k);
   const o={nombre:g("nombre"),colonia:g("colonia"),metros:g("metros"),renta:n("renta")||0,m2:n("m2"),recamaras:n("recamaras"),incluye:g("incluye"),poliza:n("poliza"),piso:g("piso"),
-    luz:g("luz"),elevador:g("elevador"),cajon:g("cajon"),mascotas:g("mascotas"),balcon:g("balcon"),cocina:g("cocina"),estado:g("estado")||"visitar",trasladoA:g("trasladoA"),trasladoR:g("trasladoR"),link:g("link"),foto:g("foto"),
+    luz:g("luz"),elevador:g("elevador"),cajon:g("cajon"),mascotas:g("mascotas"),balcon:g("balcon"),cocina:g("cocina"),estado:g("estado")||"visitar",trasladoA:g("trasladoA"),trasladoF:g("trasladoF"),trasladoR:g("trasladoR"),link:g("link"),foto:g("foto"),
     pros:g("pros").split("\n").map(s=>s.trim()).filter(Boolean),contras:g("contras").split("\n").map(s=>s.trim()).filter(Boolean)};
   if(miniPin){const p=miniPin.getLatLng();o.lat=+p.lat.toFixed(5);o.lng=+p.lng.toFixed(5)}
   if(editing)ref.depas.doc(editing.id).update(o);
@@ -1139,6 +1162,7 @@ function buildMap(){
   work([19.4372,-99.1800],css("--andrea"),"<b>SEMARNAT</b><br>Ejército Nacional 223");
   LUGARES.fermic=work([19.3242,-99.0850],css("--rafa"),"<b>Fermic</b><br>Lebrija 873, Granjas Estrella<br>Donde trabaja Rafa hoy");
   LUGARES.herdez=L.circleMarker([19.4587,-99.2128],{radius:9,color:css("--rafa"),weight:3,fillColor:css("--hoja"),fillOpacity:1}).bindPopup("<b>Herdez</b><br>Metro Cuatro Caminos<br>Propuesta de trabajo").addTo(map);
+  pintarLugares();
   map.fitBounds(ZONA_VISTA,{padding:[20,20]});
   depaLayer=L.layerGroup().addTo(map);
   renderMarkers();
