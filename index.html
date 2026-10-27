@@ -522,7 +522,7 @@ dialog h3{font-size:32px;font-style:italic;font-weight:400;margin-bottom:16px}
             <label class="f"><span>Nombre</span><input type="text" id="calNom" placeholder="Trabajo de Rafa"></label>
             <label class="f"><span>De quién</span><select id="calDe"><option value="andrea">Andrea</option><option value="rafa">Rafa</option><option value="ambos">Los dos</option></select></label>
           </div>
-          <label class="f"><span>ID del calendario</span><input type="text" id="calId" placeholder="correo@gmail.com o ...@group.calendar.google.com"></label>
+          <label class="f"><span>ID del calendario</span><input type="text" id="calId" placeholder="ID o link para compartir del calendario"></label>
           <span class="cap">Color</span><div class="colores" id="calColores"></div>
           <button class="btn chico" id="calAdd">Agregar calendario</button>
         </div>
@@ -1058,7 +1058,9 @@ function calEvents(){
   $("#calColores").addEventListener("click",e=>{const b=e.target.closest("button");if(b){S.calColor=b.dataset.c;renderCal()}});
   $("#calList").addEventListener("click",e=>{const b=e.target.closest("[data-calx]");if(!b)return;const c=[...S.config.calendarios],q=c[+b.dataset.calx];
     if(confirm(`¿Quitar "${q.nombre}" de la página? En Google Calendar no cambia nada.`)){c.splice(+b.dataset.calx,1);ref.config.set({calendarios:c},{merge:true})}});
-  $("#calAdd").onclick=()=>{const id=$("#calId").value.trim();if(!id)return;
+  /* acepta el ID o el link para compartir de Google (…?cid=base64) */
+  const calIdDe=v=>{const m=v.match(/[?&](?:cid|src)=([^&#]+)/);if(!m)return v;const c=decodeURIComponent(m[1]);try{const d=atob(c.replace(/-/g,"+").replace(/_/g,"/"));if(d.includes("@"))return d}catch(e){}return c};
+  $("#calAdd").onclick=()=>{const id=calIdDe($("#calId").value.trim());if(!id)return;
     const c=[...(S.config.calendarios||[]),{id,nombre:$("#calNom").value.trim()||"Calendario",de:$("#calDe").value,color:S.calColor}];
     $("#calId").value="";$("#calNom").value="";ref.config.set({calendarios:c},{merge:true})};
 }
