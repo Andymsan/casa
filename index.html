@@ -62,6 +62,7 @@ h1,h2,h3,.serif{font-family:var(--serif);font-weight:500;line-height:1.08;letter
 .pie .fila{display:flex;align-items:center;gap:10px}
 .pie button{background:none;border:0;cursor:pointer;color:var(--tinta2);font-size:14.6px;padding:0}
 .pie button:hover{color:var(--tinta)}
+.pie .salir{display:none;width:19px;height:19px}
 .punto{width:7px;height:7px;border-radius:50%;background:var(--limon);display:inline-block}
 .punto.off{background:var(--mango)}
 main{padding:44px var(--pad) 90px;min-width:0}
@@ -71,14 +72,19 @@ main{padding:44px var(--pad) 90px;min-width:0}
   .marca{font-size:24.6px;white-space:nowrap}.marca small{display:none}
   .tabs{flex-direction:row;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
   .tabs::-webkit-scrollbar{display:none}
-  .tab{padding:7px 12px;font-size:15.7px;white-space:nowrap}
-  .tab .svgi{display:none}
+  .tab{padding:8px 10px;font-size:15.7px;white-space:nowrap;gap:7px}
+  /* en pantallas chicas solo íconos; la pestaña abierta enseña su nombre */
+  .tab .svgi{width:22px;height:22px}
+  .tab .tx{display:none}
+  .tab.on .tx{display:inline}
   .pie{margin:0;flex-direction:row}
   .pie .quien,.pie .estado,.pie .sp{display:none}
   .pie,.pie .fila{flex:none}
+  .pie .salir{display:block}.pie .tx{display:none}
   main{padding-top:28px}
 }
-@media(max-width:560px){.marca{display:none}}
+@media(max-width:560px){.marca{display:none}.menu{gap:8px;padding:10px 12px}.tab{padding:8px 9px}.tabs{gap:0}}
+@media(max-width:420px){.tab.on .tx{display:none}.tab.on{background:var(--papel2)}}
 
 /* Paneles */
 .panel{display:none;animation:entra .45s ease}
@@ -212,6 +218,17 @@ table.t tr.tot td{font-weight:500;border-top:1px solid var(--tinta)}
 .pill.on{background:var(--tinta);color:var(--papel);border-color:var(--tinta)}
 .sp{flex:1}
 .depas{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:28px}
+.carr-n{display:none}
+/* en celular los depas van en carrusel: se desliza de uno en uno */
+@media(max-width:760px){
+  .depas{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;margin:0 calc(-1*var(--pad));padding:0 var(--pad) 6px;scroll-padding:0 var(--pad);scrollbar-width:none}
+  .depas::-webkit-scrollbar{display:none}
+  .depas>.depa{flex:0 0 86%;scroll-snap-align:center}
+  .depas>.vacio{flex:1}
+  .carr-n{display:flex;justify-content:center;gap:7px;margin:0 0 14px}
+  .carr-n i{width:7px;height:7px;border-radius:50%;background:var(--linea);transition:background .2s}
+  .carr-n i.on{background:var(--tinta2)}
+}
 .depa{background:var(--hoja);border:1px solid var(--linea);border-radius:200px 200px 22px 22px;display:flex;flex-direction:column;overflow:hidden}
 .depa.descartado{opacity:.55}
 .foto{aspect-ratio:4/3;margin:12px 12px 0;border-radius:190px 190px 14px 14px;overflow:hidden;position:relative;background:var(--papel2)}
@@ -343,6 +360,7 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
     <symbol id="i-canasta" viewBox="0 0 24 24"><path d="M3.5 10h17l-1.8 9a2 2 0 0 1-2 1.5H7.3a2 2 0 0 1-2-1.5zM8 10l3-5.5M16 10l-3-5.5M9.5 13.5v4M14.5 13.5v4"/></symbol>
     <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><circle cx="9" cy="14.5" r="1"/><circle cx="15" cy="14.5" r="1"/></symbol>
     <symbol id="i-hoja" viewBox="0 0 24 24"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14z"/><path d="M5 19l7-7"/></symbol>
+    <symbol id="i-salir" viewBox="0 0 24 24"><path d="M10 4H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/><path d="M14 8l4 4-4 4M18 12H9"/></symbol>
     <symbol id="i-luna" viewBox="0 0 24 24"><path d="M19 14.5A7.5 7.5 0 0 1 9.5 5a7.5 7.5 0 1 0 9.5 9.5z"/></symbol>
   </defs>
 </svg>
@@ -391,19 +409,19 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
   <aside class="menu">
     <div class="marca">Nuestra casa<small>Andrea y Rafa</small></div>
     <nav class="tabs" id="tabs">
-      <button class="tab" data-p="inicio"><svg class="svgi"><use href="#i-casa"/></svg>Inicio</button>
-      <button class="tab" data-p="mapa"><svg class="svgi"><use href="#i-mapa"/></svg>Mapa</button>
-      <button class="tab" data-p="gastos"><svg class="svgi"><use href="#i-monedas"/></svg>Gastos</button>
-      <button class="tab" data-p="depas"><svg class="svgi"><use href="#i-edificio"/></svg>Depas</button>
-      <button class="tab" data-p="pendientes"><svg class="svgi"><use href="#i-lista"/></svg>Por decidir</button>
-      <button class="tab" data-p="casa"><svg class="svgi"><use href="#i-canasta"/></svg>La casa</button>
-      <button class="tab" data-p="calendario"><svg class="svgi"><use href="#i-cal"/></svg>Calendario</button>
+      <button class="tab" aria-label="Inicio" title="Inicio" data-p="inicio"><svg class="svgi"><use href="#i-casa"/></svg><span class="tx">Inicio</span></button>
+      <button class="tab" aria-label="Mapa" title="Mapa" data-p="mapa"><svg class="svgi"><use href="#i-mapa"/></svg><span class="tx">Mapa</span></button>
+      <button class="tab" aria-label="Gastos" title="Gastos" data-p="gastos"><svg class="svgi"><use href="#i-monedas"/></svg><span class="tx">Gastos</span></button>
+      <button class="tab" aria-label="Depas" title="Depas" data-p="depas"><svg class="svgi"><use href="#i-edificio"/></svg><span class="tx">Depas</span></button>
+      <button class="tab" aria-label="Por decidir" title="Por decidir" data-p="pendientes"><svg class="svgi"><use href="#i-lista"/></svg><span class="tx">Por decidir</span></button>
+      <button class="tab" aria-label="La casa" title="La casa" data-p="casa"><svg class="svgi"><use href="#i-canasta"/></svg><span class="tx">La casa</span></button>
+      <button class="tab" aria-label="Calendario" title="Calendario" data-p="calendario"><svg class="svgi"><use href="#i-cal"/></svg><span class="tx">Calendario</span></button>
     </nav>
     <div class="pie">
       <div class="fila estado" id="sync"><i class="punto"></i>en la nube</div>
       <div class="fila"><span class="quien" id="whoName"></span><span class="sp"></span>
         <button onclick="Apariencia.abrir(this)" aria-label="Apariencia" title="Claro u oscuro"><svg class="svgi" style="width:18px;height:18px"><use href="#i-luna"/></svg></button>
-        <button id="btnOut">Salir</button></div>
+        <button id="btnOut" aria-label="Salir"><svg class="svgi salir"><use href="#i-salir"/></svg><span class="tx">Salir</span></button></div>
     </div>
   </aside>
 
@@ -500,6 +518,7 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
     <div class="cab"><div><h2>Los depas</h2><p>Lo que paga cada quien sale de la cuenta en Gastos.</p></div></div>
     <div class="capas opc"><span class="cap">Rafa en</span><button class="pill" data-lugar="fermic">Fermic</button><button class="pill" data-lugar="herdez">Herdez</button></div>
     <div class="filtros" id="filters"></div>
+    <div class="carr-n" id="carrN"></div>
     <div class="depas" id="depaList"></div>
   </section>
 
@@ -1073,6 +1092,12 @@ function renderDepas(){
   const act=document.activeElement,keep=act&&act.matches("[data-cm]")?{id:act.closest(".depa").dataset.id,v:act.value}:null;
   $("#depaList").innerHTML=ds.length?ds.map(depaCard).join(""):`<div class="vacio">${depasOpc().length?"Nada por aquí.":`Todavía no hay depas para ${lugarDe(escActual())==="herdez"?"Herdez":"Fermic"}. Zona ideal: ${ZONAS[lugarDe(escActual())].nombre}.`}</div>`;
   if(keep){const i=$(`#d-${keep.id} [data-cm]`);if(i){i.value=keep.v;i.focus()}}
+  $("#carrN").innerHTML=ds.length>1?ds.map((_,i)=>`<i class="${i?"":"on"}"></i>`).join(""):"";marcarCarr();
+}
+function marcarCarr(){
+  const l=$("#depaList"),cs=[...l.querySelectorAll(".depa")];if(!cs.length)return;
+  const c=l.scrollLeft+l.clientWidth/2,i=cs.reduce((b,x,k)=>Math.abs(x.offsetLeft+x.offsetWidth/2-c)<Math.abs(cs[b].offsetLeft+cs[b].offsetWidth/2-c)?k:b,0);
+  $$("#carrN i").forEach((d,k)=>d.classList.toggle("on",k===i));
 }
 function depaAction(e){
   const card=e.target.closest(".depa");if(!card)return;
@@ -1294,6 +1319,7 @@ function bootUI(){
     const i=e.target.closest("[data-ir]");if(i){showPanel(i.dataset.ir);return}
     const g=e.target.closest("[data-goto]");if(g){e.preventDefault();S.filtro="todos";showPanel("depas");renderDepas();setTimeout(()=>{const c=document.getElementById("d-"+g.dataset.goto);c&&c.scrollIntoView({block:"start"})},50)}});
   $("#depaList").addEventListener("click",depaAction);
+  $("#depaList").addEventListener("scroll",marcarCarr,{passive:true});
   $("#depaList").addEventListener("change",e=>{if(e.target.matches("[data-estado]"))ref.depas.doc(e.target.closest(".depa").dataset.id).update({estado:e.target.value})});
   $("#depaList").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.matches("[data-cm]")){const c=e.target.closest(".depa");sendCm(c,S.depas.find(x=>x.id===c.dataset.id))}});
   addEventListener("apariencia",()=>{
