@@ -252,6 +252,11 @@ table.t tr.tot td{font-weight:500;border-top:1px solid var(--tinta)}
 .sobre .meta .sp{flex:1}
 .sobre .x{opacity:.6}
 .nsub{display:none}.nsub.on{display:block}
+.toast{position:fixed;right:22px;bottom:22px;z-index:3000;display:flex;align-items:center;gap:12px;max-width:min(360px,calc(100vw - 32px));background:var(--hoja);border:1px solid var(--linea);border-left:4px solid var(--papaya);border-radius:16px;padding:14px 18px;box-shadow:0 10px 30px rgba(60,40,30,.14);cursor:pointer;animation:sube .35s ease}
+.toast .svgi{width:20px;height:20px;color:var(--barro);flex:none}
+.toast b{display:block;font-weight:500}.toast span{font-size:15px;color:var(--tinta2)}
+@keyframes sube{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+@media(max-width:560px){.toast{left:16px;right:16px;bottom:16px}}
 .llave{max-width:440px;display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
 .llave input[type=password],#dFecha{border:1px solid var(--linea);border-radius:10px;background:var(--papel);color:var(--tinta);padding:10px 14px;font:inherit}
 #dFecha{align-self:flex-start}
@@ -480,6 +485,7 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
   </div>
 </div>
 
+<div class="toast hide" id="toast" role="status"></div>
 <div id="app" class="app hide">
   <aside class="menu">
     <div class="marca">Nuestra casa<small>Andrea y Rafa</small></div>
@@ -619,7 +625,7 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
 
   <!-- Calendario -->
   <section class="panel" id="p-cartas">
-    <div class="cab"><div><h2>Nosotros</h2></div></div>
+    <div class="cab"><div><h2>Nosotros</h2></div><button class="btn chico linea hide" id="notiBtn">Activar avisos en este aparato</button></div>
     <div class="seg" id="nSeg"><button data-n="chat">Chat</button><button data-n="cartitas">Cartitas</button><button data-n="diario">Diario</button></div>
 
     <!-- Llave: chat y diario van cifrados con una frase que solo saben los dos -->
@@ -975,9 +981,9 @@ function listen(){
   S.unsub.push(ref.config.onSnapshot(meta,s=>{pw(s);aplicarConfig(s.data()||{})}));
   S.unsub.push(ref.depas.onSnapshot(meta,s=>{pw(s);S.depas=s.docs.map(d=>({id:d.id,...d.data()}));renderDepas();renderMarkers();renderInicio()}));
   S.unsub.push(ref.pend.onSnapshot(meta,s=>{pw(s);S.pend=s.docs.map(d=>({id:d.id,...d.data()}));renderPend();renderInicio()}));
-  S.unsub.push(ref.cartas.onSnapshot(meta,s=>{pw(s);S.cartas=s.docs.map(d=>({id:d.id,...d.data()}));renderCartas()}));
-  S.unsub.push(ref.chat.onSnapshot(meta,s=>{S.chat=s.docs.map(d=>({id:d.id,...d.data()}));renderChat()}));
-  S.unsub.push(ref.diario.onSnapshot(meta,s=>{S.diario=s.docs.map(d=>({id:d.id,...d.data()}));renderDiario()}));
+  S.unsub.push(ref.cartas.onSnapshot(meta,s=>{pw(s);S.cartas=s.docs.map(d=>({id:d.id,...d.data()}));renderCartas();revisarAvisos("cartas")}));
+  S.unsub.push(ref.chat.onSnapshot(meta,s=>{S.chat=s.docs.map(d=>({id:d.id,...d.data()}));renderChat();revisarAvisos("chat")}));
+  S.unsub.push(ref.diario.onSnapshot(meta,s=>{S.diario=s.docs.map(d=>({id:d.id,...d.data()}));renderDiario();revisarAvisos("diario")}));
   S.unsub.push(ref.presencia.onSnapshot(meta,s=>{S.pres={};s.docs.forEach(d=>S.pres[d.id]=d.data());renderPres()}));
   S.unsub.push(ref.cosas.onSnapshot(meta,s=>{pw(s);S.cosas=s.docs.map(d=>({id:d.id,...d.data()}));renderCasa()}));
   S.unsub.push(ref.deseos.onSnapshot(meta,s=>{pw(s);S.deseos=s.docs.map(d=>({id:d.id,...d.data()}));
@@ -1220,6 +1226,47 @@ function diarioEvents(){
   $("#dGuardar").onclick=async()=>{const t=$("#dTexto").value.trim(),f=$("#dFecha").value;if(!t||!f||!LLAVE)return;
     await ref.diario.doc(f+"-"+S.quien).set({fecha:f,de:S.quien,t:Date.now(),...await cifrar({texto:t,animo:S.dAnimo})});
     $("#dGuardar").textContent="Guardado";setTimeout(()=>$("#dGuardar").textContent="Guardar",1500)};
+}
+
+/* ---------- Avisos: cuando el otro pone algo en Nosotros ----------
+   Dentro de la página sale un aviso; con la página en segundo plano, una notificación del aparato.
+   Las notificaciones no llevan el texto, para que no se lea en la pantalla bloqueada. */
+const visto={chat:null,cartas:null,diario:null,abiertas:null};
+function nuevos(tipo,docs,clave){
+  const ids=new Set(docs.map(clave));
+  if(visto[tipo]===null){visto[tipo]=ids;return []}
+  const n=docs.filter(d=>!visto[tipo].has(clave(d)));visto[tipo]=ids;return n;
+}
+let toastT=null,sinLeer=0;
+function avisar(titulo,texto,seg,icono){
+  const viendo=document.visibilityState==="visible"&&$("#p-cartas").classList.contains("on")&&S.nSeg===seg;
+  if(!viendo){
+    const t=$("#toast");t.innerHTML=`<svg class="svgi"><use href="#i-${icono}"/></svg><div><b>${esc(titulo)}</b><span>${esc(texto)}</span></div>`;
+    t.classList.remove("hide");t.onclick=()=>{t.classList.add("hide");S.nSeg=seg;pintarLlave();showPanel("cartas");leido()};
+    clearTimeout(toastT);toastT=setTimeout(()=>t.classList.add("hide"),7000);
+  }
+  if(document.visibilityState!=="visible"){
+    sinLeer++;document.title=`(${sinLeer}) Nuestra casa`;
+    if("Notification" in window&&Notification.permission==="granted"&&navigator.serviceWorker)
+      navigator.serviceWorker.ready.then(r=>r.showNotification(titulo,{body:texto,tag:"casa-"+seg,renotify:true})).catch(()=>{});
+  }
+}
+function revisarAvisos(tipo){
+  if(!S.quien)return;const n=NOMBRE[otro()];
+  if(tipo==="chat"){const m=nuevos("chat",S.chat,d=>d.id).filter(d=>d.de!==S.quien);if(m.length)avisar(`${n} te escribió`,m.length>1?`${m.length} mensajes nuevos`:"Un mensaje nuevo","chat","corazon")}
+  if(tipo==="cartas"){
+    const c=nuevos("cartas",S.cartas,d=>d.id).filter(d=>d.para===S.quien);
+    if(c.length){const x=c[0];avisar(`${n} te dejó ${x.tipo==="regalo"?"un regalo":"una cartita"}`,x.abrirDesde&&Date.now()<x.abrirDesde?`Se abre el ${fechaCorta(x.abrirDesde)}`:x.tipo==="regalo"?"Ya lo puedes abrir":"Ya la puedes abrir","cartitas",x.tipo==="regalo"?"regalo":"sobre")}
+    const a=nuevos("abiertas",S.cartas.filter(d=>d.de===S.quien&&d.abierta),d=>d.id);
+    if(a.length)avisar(`${n} abrió tu ${a[0].tipo==="regalo"?"regalo":"cartita"}`,"","cartitas","sobre");
+  }
+  if(tipo==="diario"){const d=nuevos("diario",S.diario,x=>x.id+":"+x.t).filter(x=>x.de!==S.quien);if(d.length)avisar(`${n} escribió en el diario`,diaLargo(new Date(d[0].fecha+"T12:00")),"diario","lista")}
+}
+function notiEvents(){
+  const b=$("#notiBtn"),pinta=()=>b.classList.toggle("hide",!("Notification" in window)||Notification.permission!=="default");
+  if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+  pinta();b.onclick=()=>Notification.requestPermission().then(pinta);
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){sinLeer=0;document.title="Nuestra casa"}});
 }
 
 /* ---------- Cartitas ---------- */
@@ -1686,7 +1733,7 @@ function bootUI(){
   const opt=o=>Object.entries(o).map(([k,v])=>`<option value="${k}">${v}</option>`).join("");
   ["luz","elevador","cajon","mascotas","balcon","cocina"].forEach(k=>$("#dForm").elements[k].innerHTML=opt(SINO));
   $("#dForm").elements.estado.innerHTML=opt(ESTADOS);
-  bindInputs();escEvents();escEventsA();cartaEvents();presEvents();llaveEvents();chatEvents();diarioEvents();deseoEvents();listEvents();calEvents();buildMap();lugaresEvents();
+  bindInputs();escEvents();escEventsA();cartaEvents();presEvents();llaveEvents();chatEvents();diarioEvents();notiEvents();deseoEvents();listEvents();calEvents();buildMap();lugaresEvents();
   $("#rentRange").addEventListener("input",ev=>{rentaSim=+ev.target.value;renderCalc()});
   $("#tabs").addEventListener("click",e=>{const t=e.target.closest(".tab");if(t)showPanel(t.dataset.p)});
   addEventListener("hashchange",()=>showPanel(location.hash.slice(1)));
