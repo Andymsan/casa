@@ -84,7 +84,7 @@ main{padding:44px var(--pad) 90px;min-width:0}
   main{padding-top:28px}
 }
 @media(max-width:560px){.marca{display:none}.menu{gap:8px;padding:10px 12px}.tab{padding:8px 9px}.tabs{gap:0}}
-@media(max-width:420px){.tab.on .tx{display:none}.tab.on{background:var(--papel2)}}
+@media(max-width:420px){.tab.on .tx{display:none}.tab.on{background:var(--papel2)}.tab{padding:8px 6px}}
 
 /* Paneles */
 .panel{display:none;animation:entra .45s ease}
@@ -219,6 +219,40 @@ table.t tr.tot td{font-weight:500;border-top:1px solid var(--tinta)}
 .sp{flex:1}
 .depas{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:28px}
 .carr-n{display:none}
+/* presencia */
+.pres{display:flex;align-items:center;gap:8px;font-size:15px;color:var(--tinta2)}
+.pres i{width:8px;height:8px;border-radius:50%;background:var(--linea);flex:none}
+.pres.on i{background:var(--andrea);box-shadow:0 0 0 4px color-mix(in srgb,var(--andrea) 22%,transparent)}
+#presIni{margin-top:14px}
+/* cartitas */
+.tab{position:relative}
+.aviso-punto{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--papaya)}
+#avisoCarta:not(:empty){margin:0 0 22px}
+.carta-aviso{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--papaya);background:var(--papaya-s);color:var(--barro);border-radius:999px;padding:9px 18px;font-size:15.7px;cursor:pointer}
+.carta-aviso .svgi{width:18px;height:18px}
+.cartas{display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:44px;align-items:start}
+@media(max-width:900px){.cartas{grid-template-columns:minmax(0,1fr)}}
+.escribir{display:flex;flex-direction:column;gap:14px}
+.escribir textarea{font:italic 400 22px/1.45 var(--serif);border:1px solid var(--linea);border-radius:14px;background:var(--papel);color:var(--tinta);padding:14px 16px;resize:vertical}
+.escribir input[type=datetime-local]{border:1px solid var(--linea);border-radius:10px;background:var(--papel);color:var(--tinta);padding:8px 12px;font:inherit}
+.frases,.tipos{display:flex;flex-wrap:wrap;gap:6px}
+.frases .pill{font-size:14px;padding:5px 12px}
+.tipos .pill{display:inline-flex;align-items:center;gap:7px}.tipos .svgi{width:16px;height:16px}
+.tipos .pill.on{background:var(--papaya);border-color:var(--papaya);color:var(--hoja)}
+.sobres{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:18px;margin-top:12px}
+.sobre{position:relative;background:var(--hoja);border:1px solid var(--linea);border-radius:16px;padding:44px 20px 18px;min-height:150px;overflow:hidden}
+.sobre:before{content:"";position:absolute;left:0;right:0;top:0;height:58px;background:var(--papel2);clip-path:polygon(0 0,100% 0,50% 100%)}
+.sobre .sello{position:absolute;left:50%;top:34px;transform:translateX(-50%);width:40px;height:40px;border-radius:50%;background:var(--papaya);color:var(--hoja);display:grid;place-items:center;box-shadow:0 1px 0 var(--barro)}
+.sobre .sello .svgi{width:19px;height:19px}
+.sobre .pie-s{margin-top:52px;text-align:center;font-size:15px;color:var(--tinta2)}
+.sobre .pie-s b{display:block;font:italic 500 24px/1.2 var(--serif);color:var(--tinta);margin-bottom:4px}
+.sobre.abierta{padding-top:22px}.sobre.abierta:before,.sobre.abierta .sello{display:none}
+.sobre .texto{font:italic 400 23px/1.45 var(--serif);white-space:pre-wrap;color:var(--tinta)}
+.sobre .meta{margin-top:12px;font-size:14px;color:var(--suave);display:flex;gap:10px;align-items:center}
+.sobre .meta .sp{flex:1}
+.sobre .x{opacity:.6}
+.sobre.nueva{animation:abrir .6s ease}
+@keyframes abrir{from{transform:scale(.96);opacity:.4}to{transform:none;opacity:1}}
 /* en celular los depas van en carrusel: se desliza de uno en uno */
 @media(max-width:760px){
   .depas{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;margin:0 calc(-1*var(--pad));padding:0 var(--pad) 6px;scroll-padding:0 var(--pad);scrollbar-width:none}
@@ -361,6 +395,9 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
     <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><circle cx="9" cy="14.5" r="1"/><circle cx="15" cy="14.5" r="1"/></symbol>
     <symbol id="i-hoja" viewBox="0 0 24 24"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14z"/><path d="M5 19l7-7"/></symbol>
     <symbol id="i-salir" viewBox="0 0 24 24"><path d="M10 4H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/><path d="M14 8l4 4-4 4M18 12H9"/></symbol>
+    <symbol id="i-sobre" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/></symbol>
+    <symbol id="i-corazon" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></symbol>
+    <symbol id="i-regalo" viewBox="0 0 24 24"><rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M3 9h18M12 9v11M12 9c-2-4-6-4-6-1.5S10 9 12 9zm0 0c2-4 6-4 6-1.5S14 9 12 9z"/></symbol>
     <symbol id="i-luna" viewBox="0 0 24 24"><path d="M19 14.5A7.5 7.5 0 0 1 9.5 5a7.5 7.5 0 1 0 9.5 9.5z"/></symbol>
   </defs>
 </svg>
@@ -415,9 +452,11 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
       <button class="tab" aria-label="Depas" title="Depas" data-p="depas"><svg class="svgi"><use href="#i-edificio"/></svg><span class="tx">Depas</span></button>
       <button class="tab" aria-label="Por decidir" title="Por decidir" data-p="pendientes"><svg class="svgi"><use href="#i-lista"/></svg><span class="tx">Por decidir</span></button>
       <button class="tab" aria-label="La casa" title="La casa" data-p="casa"><svg class="svgi"><use href="#i-canasta"/></svg><span class="tx">La casa</span></button>
+      <button class="tab" aria-label="Cartitas" title="Cartitas" data-p="cartas"><svg class="svgi"><use href="#i-sobre"/></svg><span class="tx">Cartitas</span><i class="aviso-punto hide" id="cartaPunto"></i></button>
       <button class="tab" aria-label="Calendario" title="Calendario" data-p="calendario"><svg class="svgi"><use href="#i-cal"/></svg><span class="tx">Calendario</span></button>
     </nav>
     <div class="pie">
+      <div class="fila estado pres" id="presPie"></div>
       <div class="fila estado" id="sync"><i class="punto"></i>en la nube</div>
       <div class="fila"><span class="quien" id="whoName"></span><span class="sp"></span>
         <button onclick="Apariencia.abrir(this)" aria-label="Apariencia" title="Claro u oscuro"><svg class="svgi" style="width:18px;height:18px"><use href="#i-luna"/></svg></button>
@@ -431,8 +470,10 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
     <div class="portada">
       <div>
         <div class="firma"><i></i>Andrea y Rafa</div>
+        <div class="pres" id="presIni"></div>
         <h1 style="margin-top:22px">Nuestra<span>casa</span></h1>
         <p class="bajada ital serif" style="font-size:clamp(24px,2.4vw,32px)">Eres mi casa, te amo chiquelique.</p>
+        <div id="avisoCarta"></div>
         <button class="btn" data-ir="depas">Ver los depas</button>
       </div>
       <div class="arco" id="portadaArco"></div>
@@ -538,6 +579,25 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
   </section>
 
   <!-- Calendario -->
+  <section class="panel" id="p-cartas">
+    <div class="cab"><div><h2>Cartitas</h2></div></div>
+    <div class="cartas">
+      <div class="hoja escribir">
+        <h4 id="cPara">Para Rafa</h4>
+        <div class="frases" id="cFrases"></div>
+        <textarea id="cTexto" rows="5" placeholder="Escribe aquí"></textarea>
+        <div class="tipos"><button class="pill on" data-tipo="carta"><svg class="svgi"><use href="#i-corazon"/></svg>Cartita</button><button class="pill" data-tipo="regalo"><svg class="svgi"><use href="#i-regalo"/></svg>Regalo</button></div>
+        <label class="chk"><input type="checkbox" id="cSello"> Que no se abra antes de</label>
+        <input type="datetime-local" id="cCuando" class="hide">
+        <button class="btn" id="cEnviar">Dejar cartita</button>
+      </div>
+      <div>
+        <h4>Para ti</h4><div class="sobres" id="cRecibidas"></div>
+        <h4 style="margin-top:40px">Las que dejaste</h4><div class="sobres" id="cEnviadas"></div>
+      </div>
+    </div>
+  </section>
+
   <section class="panel" id="p-calendario">
     <div class="cab"><div><h2>El calendario</h2><p>Los calendarios de Google de los dos en un solo lugar.</p></div></div>
     <div class="calbar">
@@ -659,7 +719,9 @@ const ref={
   depas:fdb.collection("casa").doc("hogar").collection("depas"),
   pend:fdb.collection("casa").doc("hogar").collection("pendientes"),
   cosas:fdb.collection("casa").doc("hogar").collection("cosas"),
-  deseos:fdb.collection("casa").doc("hogar").collection("deseos")
+  deseos:fdb.collection("casa").doc("hogar").collection("deseos"),
+  cartas:fdb.collection("casa").doc("hogar").collection("cartas"),
+  presencia:fdb.collection("casa").doc("hogar").collection("presencia")
 };
 
 const DEFAULT_CONFIG={ingA:0,ingR:0,valesR:0,contarVales:false,rentaActual:0,rentaIdeal:16000,servicios:2000,poliza:5000,depositoMeses:1,ahorrado:0,fechaMeta:"2027-02-01",calendarios:[]};
@@ -724,7 +786,7 @@ const PARCHE_DEPAS4={
   "observatorio-homie":{trasladoF:"1 h 05 min, Línea 7 a Mixcoac y Línea 12 a Calle 11, aprox."}
 };
 
-const S={uid:null,quien:null,config:{...DEFAULT_CONFIG},depas:[],pend:[],cosas:[],deseos:null,filtro:"activos",casaTab:"despensa",calModo:"WEEK",calColor:GCOLORES[0],unsub:[],booted:false};
+const S={uid:null,quien:null,config:{...DEFAULT_CONFIG},depas:[],pend:[],cosas:[],deseos:null,cartas:[],pres:{},cTipo:"carta",filtro:"activos",casaTab:"despensa",calModo:"WEEK",calColor:GCOLORES[0],unsub:[],booted:false};
 
 /* ---------- Entrada ---------- */
 $("#gateArco").innerHTML=$("#tplArco").innerHTML;
@@ -811,6 +873,8 @@ function listen(){
     fillInputs();fillEsc();fillEscA();renderCalc();renderDepas();renderMarkers();renderCal();renderInicio()}));
   S.unsub.push(ref.depas.onSnapshot(meta,s=>{pw(s);S.depas=s.docs.map(d=>({id:d.id,...d.data()}));renderDepas();renderMarkers();renderInicio()}));
   S.unsub.push(ref.pend.onSnapshot(meta,s=>{pw(s);S.pend=s.docs.map(d=>({id:d.id,...d.data()}));renderPend();renderInicio()}));
+  S.unsub.push(ref.cartas.onSnapshot(meta,s=>{pw(s);S.cartas=s.docs.map(d=>({id:d.id,...d.data()}));renderCartas()}));
+  S.unsub.push(ref.presencia.onSnapshot(meta,s=>{S.pres={};s.docs.forEach(d=>S.pres[d.id]=d.data());renderPres()}));
   S.unsub.push(ref.cosas.onSnapshot(meta,s=>{pw(s);S.cosas=s.docs.map(d=>({id:d.id,...d.data()}));renderCasa()}));
   S.unsub.push(ref.deseos.onSnapshot(meta,s=>{pw(s);S.deseos=s.docs.map(d=>({id:d.id,...d.data()}));
     /* la primera vez se llena con la lista original; ids fijos para que no se duplique */
@@ -896,6 +960,68 @@ function deseoEvents(){
   const add=()=>{const t=$("#dText").value.trim();if(!t)return;$("#dText").value="";ref.deseos.doc().set({grupo:$("#dGrupo").value,texto:t,icono:"hoja",por:S.quien,creado:Date.now()})};
   $("#dAdd").onclick=add;$("#dText").addEventListener("keydown",e=>{if(e.key==="Enter")add()});
   $("#deseos").addEventListener("click",e=>{const li=e.target.closest("li[data-id]");if(li&&e.target.matches(".x")){const d=S.deseos.find(x=>x.id===li.dataset.id);if(confirm(`¿Quitar "${d.texto}" de la lista?`))ref.deseos.doc(d.id).delete()}});
+}
+
+/* ---------- Presencia: se ve si el otro tiene la página abierta ---------- */
+const otro=()=>S.quien==="rafa"?"andrea":"rafa";
+function hace(t){const m=Math.round((Date.now()-t)/60000);
+  if(m<2)return"hace un momento";if(m<60)return`hace ${m} min`;const h=Math.round(m/60);if(h<24)return`hace ${h} h`;
+  const d=Math.round(h/24);return d===1?"ayer":d<7?`hace ${d} días`:new Date(t).toLocaleDateString("es-MX",{day:"numeric",month:"short"})}
+function renderPres(){
+  if(!S.booted||!S.quien)return;const o=otro(),p=S.pres[o],n=NOMBRE[o];
+  const on=p&&p.activo&&Date.now()-p.t<150000;
+  const tx=on?`${n} está aquí`:p?`${n} entró ${hace(p.t)}`:`${n} todavía no entra`;
+  for(const q of ["#presPie","#presIni"]){const el=$(q);el.classList.toggle("on",!!on);el.innerHTML=`<i></i>${tx}`}
+}
+let presT=null;
+function latido(activo){if(S.quien)ref.presencia.doc(S.quien).set({t:Date.now(),activo},{merge:true}).catch(()=>{})}
+function presEvents(){
+  latido(true);presT=setInterval(()=>{if(document.visibilityState==="visible")latido(true);renderPres()},60000);
+  document.addEventListener("visibilitychange",()=>latido(document.visibilityState==="visible"));
+  addEventListener("pagehide",()=>latido(false));
+}
+
+/* ---------- Cartitas ---------- */
+const FRASES=["Te quiero mucho","Que tengas un excelente día","Te dejé algo","Te mandé un regalo","Te amo, chiquelique"];
+const fechaCorta=t=>new Date(t).toLocaleString("es-MX",{weekday:"short",day:"numeric",month:"short",hour:"numeric",minute:"2-digit"});
+function sobreHTML(c,mia){
+  const ahora=Date.now(),sellada=c.abrirDesde&&ahora<c.abrirDesde,icono=c.tipo==="regalo"?"regalo":"corazon";
+  const x=`<button class="x" data-cx="${c.id}" aria-label="Borrar">×</button>`;
+  if(mia){
+    const st=c.abierta?`${NOMBRE[c.para]} la abrió ${hace(c.abiertaEn||c.creado)}`:sellada?`Sellada hasta el ${fechaCorta(c.abrirDesde)}`:"Todavía sin abrir";
+    return `<div class="sobre abierta"><div class="texto">${esc(c.texto)}</div><div class="meta"><span>${st}</span><span class="sp"></span>${x}</div></div>`;
+  }
+  if(c.abierta)return `<div class="sobre abierta" data-id="${c.id}"><div class="texto">${esc(c.texto)}</div><div class="meta"><span>De ${NOMBRE[c.de]}, ${fechaCorta(c.creado)}</span><span class="sp"></span>${x}</div></div>`;
+  return `<div class="sobre"><div class="sello"><svg class="svgi"><use href="#i-${icono}"/></svg></div><div class="pie-s"><b>${c.tipo==="regalo"?"Un regalo":"Una cartita"} de ${NOMBRE[c.de]}</b>${sellada?`Se abre el ${fechaCorta(c.abrirDesde)}`:`<button class="btn chico" data-abrir="${c.id}" style="margin-top:8px">Abrirla</button>`}</div></div>`;
+}
+function renderCartas(){
+  if(!S.booted||!S.quien)return;
+  const yo=S.quien,ord=(a,b)=>b.creado-a.creado;
+  const rec=S.cartas.filter(c=>c.para===yo).sort(ord),env=S.cartas.filter(c=>c.de===yo).sort(ord);
+  $("#cRecibidas").innerHTML=rec.map(c=>sobreHTML(c,false)).join("")||`<div class="vacio">Nada todavía.</div>`;
+  $("#cEnviadas").innerHTML=env.map(c=>sobreHTML(c,true)).join("")||`<div class="vacio">Nada todavía.</div>`;
+  const listas=rec.filter(c=>!c.abierta&&!(c.abrirDesde&&Date.now()<c.abrirDesde));
+  $("#cartaPunto").classList.toggle("hide",!listas.length);
+  const n=NOMBRE[otro()];
+  $("#avisoCarta").innerHTML=listas.length?`<button class="carta-aviso" data-ir="cartas"><svg class="svgi"><use href="#i-sobre"/></svg>${n} te dejó ${listas.length>1?listas.length+" cartitas":listas[0].tipo==="regalo"?"un regalo":"una cartita"}</button>`:"";
+}
+function proximoMediodia(){const d=new Date();if(d.getHours()>=12)d.setDate(d.getDate()+1);d.setHours(12,0,0,0);
+  const z=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T12:00`}
+function cartaEvents(){
+  $("#cPara").textContent="Para "+NOMBRE[otro()];
+  $("#cFrases").innerHTML=FRASES.map(f=>`<button class="pill" data-frase="${esc(f)}">${esc(f)}</button>`).join("");
+  $("#cFrases").addEventListener("click",e=>{const b=e.target.closest("[data-frase]");if(!b)return;const t=$("#cTexto");t.value=(t.value.trim()?t.value.trim()+" ":"")+b.dataset.frase;t.focus()});
+  $(".tipos").addEventListener("click",e=>{const b=e.target.closest("[data-tipo]");if(!b)return;S.cTipo=b.dataset.tipo;$$(".tipos .pill").forEach(x=>x.classList.toggle("on",x===b))});
+  $("#cSello").addEventListener("change",e=>{$("#cCuando").classList.toggle("hide",!e.target.checked);if(e.target.checked&&!$("#cCuando").value)$("#cCuando").value=proximoMediodia()});
+  $("#cEnviar").onclick=()=>{const t=$("#cTexto").value.trim();if(!t){$("#cTexto").focus();return}
+    const cuando=$("#cSello").checked&&$("#cCuando").value?new Date($("#cCuando").value).getTime():null;
+    ref.cartas.doc().set({de:S.quien,para:otro(),texto:t,tipo:S.cTipo,abrirDesde:cuando,abierta:false,creado:Date.now()});
+    $("#cTexto").value="";$("#cSello").checked=false;$("#cCuando").classList.add("hide")};
+  $("#p-cartas").addEventListener("click",e=>{
+    const a=e.target.closest("[data-abrir]");if(a){ref.cartas.doc(a.dataset.abrir).update({abierta:true,abiertaEn:Date.now()});setTimeout(()=>{const s=$(`.sobre[data-id="${a.dataset.abrir}"]`);s&&s.classList.add("nueva")},60);return}
+    const x=e.target.closest("[data-cx]");if(x&&confirm("¿Borrar esta cartita?"))ref.cartas.doc(x.dataset.cx).delete()});
+  /* las selladas se revisan cada minuto para abrirse a su hora */
+  setInterval(renderCartas,60000);
 }
 
 /* ---------- Gastos ---------- */
@@ -1311,7 +1437,7 @@ function bootUI(){
   const opt=o=>Object.entries(o).map(([k,v])=>`<option value="${k}">${v}</option>`).join("");
   ["luz","elevador","cajon","mascotas","balcon","cocina"].forEach(k=>$("#dForm").elements[k].innerHTML=opt(SINO));
   $("#dForm").elements.estado.innerHTML=opt(ESTADOS);
-  bindInputs();escEvents();escEventsA();deseoEvents();listEvents();calEvents();buildMap();lugaresEvents();
+  bindInputs();escEvents();escEventsA();cartaEvents();presEvents();deseoEvents();listEvents();calEvents();buildMap();lugaresEvents();
   $("#rentRange").addEventListener("input",ev=>{rentaSim=+ev.target.value;renderCalc()});
   $("#tabs").addEventListener("click",e=>{const t=e.target.closest(".tab");if(t)showPanel(t.dataset.p)});
   addEventListener("hashchange",()=>showPanel(location.hash.slice(1)));
@@ -1327,7 +1453,7 @@ function bootUI(){
     if(miniMap){miniMap.remove();miniMap=null;miniPin=null}
     if($("#p-mapa").classList.contains("on"))setTimeout(()=>map.invalidateSize(),30)});
   showPanel(location.hash.slice(1)||"inicio");
-  fillInputs();fillEsc();fillEscA();renderCalc();renderDepas();renderPend();renderCasa();renderCal();renderInicio();renderDeseos();
+  fillInputs();fillEsc();fillEscA();renderCalc();renderDepas();renderPend();renderCasa();renderCal();renderInicio();renderDeseos();renderCartas();renderPres();
 }
 </script>
 </body>
