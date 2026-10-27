@@ -251,6 +251,34 @@ table.t tr.tot td{font-weight:500;border-top:1px solid var(--tinta)}
 .sobre .meta{margin-top:12px;font-size:14px;color:var(--suave);display:flex;gap:10px;align-items:center}
 .sobre .meta .sp{flex:1}
 .sobre .x{opacity:.6}
+.nsub{display:none}.nsub.on{display:block}
+.llave{max-width:440px;display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
+.llave input[type=password],#dFecha{border:1px solid var(--linea);border-radius:10px;background:var(--papel);color:var(--tinta);padding:10px 14px;font:inherit}
+#dFecha{align-self:flex-start}
+.chat{display:flex;flex-direction:column;padding:0;max-width:760px;height:min(70vh,640px);overflow:hidden}
+.chat-cab{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--linea)}
+.chat-cab .sp{flex:1}
+.candado{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--suave)}.candado .svgi{width:14px;height:14px}
+.msgs{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:6px}
+.msg{max-width:78%;padding:9px 14px;border-radius:18px;font-size:17px;line-height:1.4;white-space:pre-wrap;word-wrap:break-word}
+.msg.yo{align-self:flex-end;background:var(--andrea-s);border-bottom-right-radius:6px}
+.msg.el{align-self:flex-start;background:var(--papel2);border-bottom-left-radius:6px}
+.msg.rafa.yo{background:var(--rafa-s)}.msg.andrea.el{background:var(--andrea-s)}.msg.rafa.el{background:var(--rafa-s)}.msg.andrea.yo{background:var(--andrea-s)}
+.msg small{display:block;font-size:12px;color:var(--suave);margin-top:2px}
+.msg.yo small{text-align:right}
+.dia-sep{align-self:center;font-size:13px;color:var(--suave);margin:10px 0 4px;letter-spacing:.04em}
+.chat-in{display:flex;gap:10px;padding:12px 14px;border-top:1px solid var(--linea);align-items:flex-end}
+.chat-in textarea{flex:1;resize:none;border:1px solid var(--linea);border-radius:20px;background:var(--papel);color:var(--tinta);padding:10px 16px;font:inherit;max-height:140px}
+.dias{display:flex;flex-direction:column;gap:22px}
+.dia{border-top:1px solid var(--linea);padding-top:16px}
+.dia h4{margin-bottom:10px}
+.dia .dos{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:620px){.dia .dos{grid-template-columns:1fr}}
+.dia .lado-d b{display:block;font-size:14px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.dia .lado-d.andrea b{color:var(--andrea)}.dia .lado-d.rafa b{color:var(--rafa)}
+.dia .lado-d p{font:italic 400 21px/1.45 var(--serif);white-space:pre-wrap}
+.dia .animo{display:inline-block;font-size:13px;border:1px solid var(--linea);border-radius:99px;padding:1px 10px;margin-bottom:6px;color:var(--tinta2)}
+.frases .pill.on{background:var(--tinta);border-color:var(--tinta);color:var(--papel)}
 .sobre.nueva{animation:abrir .6s ease}
 @keyframes abrir{from{transform:scale(.96);opacity:.4}to{transform:none;opacity:1}}
 /* en celular los depas van en carrusel: se desliza de uno en uno */
@@ -438,6 +466,16 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
       <div class="alt"><button class="lnk" id="btnSignup">Crear cuenta</button><button class="lnk" id="btnReset">Olvidé la contraseña</button></div>
     </div>
     <div id="pickBox" class="hide"><p>¿Quién eres?</p><p class="suave" id="pickEmail" style="font-size:15px;margin-top:-6px"></p><div class="elige" id="pickBtns"></div><div class="err" id="pickErr"></div></div>
+    <div id="fraseBox" class="hide">
+      <p id="fTit">Frase secreta</p>
+      <p class="suave" id="fTx" style="font-size:15px;margin-top:-6px"></p>
+      <label class="f"><span>Frase</span><input id="f1" type="password" autocomplete="off"></label>
+      <label class="f hide" id="f2l"><span>Otra vez</span><input id="f2" type="password" autocomplete="off"></label>
+      <label class="chk"><input type="checkbox" id="fRec"> Recordarla en este aparato</label>
+      <button class="btn" id="fBtn">Entrar</button>
+      <div class="err" id="fErr"></div>
+      <div class="alt"><button class="lnk" id="fOut">Salir</button></div>
+    </div>
     <div id="denyBox" class="hide"><div class="err" id="denyErr" style="margin-bottom:14px"></div><button class="btn linea" id="btnOut2">Salir</button></div>
   </div>
 </div>
@@ -452,7 +490,7 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
       <button class="tab" aria-label="Depas" title="Depas" data-p="depas"><svg class="svgi"><use href="#i-edificio"/></svg><span class="tx">Depas</span></button>
       <button class="tab" aria-label="Por decidir" title="Por decidir" data-p="pendientes"><svg class="svgi"><use href="#i-lista"/></svg><span class="tx">Por decidir</span></button>
       <button class="tab" aria-label="La casa" title="La casa" data-p="casa"><svg class="svgi"><use href="#i-canasta"/></svg><span class="tx">La casa</span></button>
-      <button class="tab" aria-label="Cartitas" title="Cartitas" data-p="cartas"><svg class="svgi"><use href="#i-sobre"/></svg><span class="tx">Cartitas</span><i class="aviso-punto hide" id="cartaPunto"></i></button>
+      <button class="tab" aria-label="Nosotros" title="Nosotros" data-p="cartas"><svg class="svgi"><use href="#i-corazon"/></svg><span class="tx">Nosotros</span><i class="aviso-punto hide" id="cartaPunto"></i></button>
       <button class="tab" aria-label="Calendario" title="Calendario" data-p="calendario"><svg class="svgi"><use href="#i-cal"/></svg><span class="tx">Calendario</span></button>
     </nav>
     <div class="pie">
@@ -581,7 +619,43 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
 
   <!-- Calendario -->
   <section class="panel" id="p-cartas">
-    <div class="cab"><div><h2>Cartitas</h2></div></div>
+    <div class="cab"><div><h2>Nosotros</h2></div></div>
+    <div class="seg" id="nSeg"><button data-n="chat">Chat</button><button data-n="cartitas">Cartitas</button><button data-n="diario">Diario</button></div>
+
+    <!-- Llave: chat y diario van cifrados con una frase que solo saben los dos -->
+    <div class="hoja llave hide" id="llave">
+      <h4 id="llaveTit">Frase secreta</h4>
+      <p class="suave" id="llaveTx"></p>
+      <input type="password" id="llave1" placeholder="Frase secreta" autocomplete="off">
+      <input type="password" id="llave2" placeholder="Otra vez la frase" autocomplete="off" class="hide">
+      <label class="chk"><input type="checkbox" id="llaveRec"> Recordarla en este aparato</label>
+      <button class="btn" id="llaveBtn">Abrir</button>
+      <div class="err" id="llaveErr"></div>
+    </div>
+
+    <div class="nsub" id="n-chat">
+      <div class="chat hoja">
+        <div class="chat-cab"><div class="pres" id="presChat"></div><span class="sp"></span><span class="candado"><svg class="svgi"><use href="#i-llave"/></svg>Cifrado</span></div>
+        <div class="msgs" id="msgs"></div>
+        <div class="chat-in"><textarea id="mText" rows="1" placeholder="Escribe algo"></textarea><button class="btn" id="mSend">Enviar</button></div>
+      </div>
+    </div>
+
+    <div class="nsub" id="n-diario">
+      <div class="cartas">
+        <div class="hoja escribir">
+          <h4>El día de hoy</h4>
+          <input type="date" id="dFecha">
+          <div class="frases" id="dAnimos"></div>
+          <textarea id="dTexto" rows="6" placeholder="Cómo fue el día, desde tu lado"></textarea>
+          <button class="btn" id="dGuardar">Guardar</button>
+          <span class="suave" style="font-size:14px"><svg class="svgi" style="width:14px;height:14px;vertical-align:-2px"><use href="#i-llave"/></svg> Cifrado con su frase</span>
+        </div>
+        <div class="dias" id="dias"></div>
+      </div>
+    </div>
+
+    <div class="nsub" id="n-cartitas">
     <div class="cartas">
       <div class="hoja escribir">
         <h4 id="cPara">Para Rafa</h4>
@@ -597,6 +671,8 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
         <h4 style="margin-top:40px">Las que dejaste</h4><div class="sobres" id="cEnviadas"></div>
       </div>
     </div>
+    </div>
+    <button class="lnk hide" id="llaveOlvidar" style="margin-top:30px">Olvidar la frase en este aparato</button>
   </section>
 
   <section class="panel" id="p-calendario">
@@ -722,7 +798,9 @@ const ref={
   cosas:fdb.collection("casa").doc("hogar").collection("cosas"),
   deseos:fdb.collection("casa").doc("hogar").collection("deseos"),
   cartas:fdb.collection("casa").doc("hogar").collection("cartas"),
-  presencia:fdb.collection("casa").doc("hogar").collection("presencia")
+  presencia:fdb.collection("casa").doc("hogar").collection("presencia"),
+  chat:fdb.collection("casa").doc("hogar").collection("chat"),
+  diario:fdb.collection("casa").doc("hogar").collection("diario")
 };
 
 const DEFAULT_CONFIG={ingA:0,ingR:0,valesR:0,contarVales:false,rentaActual:0,rentaIdeal:16000,servicios:2000,poliza:5000,depositoMeses:1,ahorrado:0,fechaMeta:"2027-02-01",calendarios:[]};
@@ -787,7 +865,7 @@ const PARCHE_DEPAS4={
   "observatorio-homie":{trasladoF:"1 h 05 min, Línea 7 a Mixcoac y Línea 12 a Calle 11, aprox."}
 };
 
-const S={uid:null,quien:null,config:{...DEFAULT_CONFIG},depas:[],pend:[],cosas:[],deseos:null,cartas:[],pres:{},cTipo:"carta",filtro:"activos",casaTab:"despensa",calModo:"WEEK",calColor:GCOLORES[0],unsub:[],booted:false};
+const S={uid:null,quien:null,config:{...DEFAULT_CONFIG},depas:[],pend:[],cosas:[],deseos:null,cartas:[],pres:{},cTipo:"carta",chat:[],diario:[],nSeg:"chat",dAnimo:null,filtro:"activos",casaTab:"despensa",calModo:"WEEK",calColor:GCOLORES[0],unsub:[],booted:false};
 
 /* ---------- Entrada ---------- */
 $("#gateArco").innerHTML=$("#tplArco").innerHTML;
@@ -799,12 +877,12 @@ $("#btnSignup").onclick=()=>{gateErr("");const em=$("#em").value.trim(),pw=$("#p
 $("#btnReset").onclick=()=>{const em=$("#em").value.trim();if(!em)return gateErr("Escribe el correo primero.");auth.sendPasswordResetEmail(em).then(()=>gateErr("Llegará un correo para cambiarla.")).catch(e=>gateErr(authMsg(e)))};
 $("#btnOut").onclick=$("#btnOut2").onclick=()=>auth.signOut();
 
-function showGate(box){["loginBox","pickBox","denyBox"].forEach(b=>$("#"+b).classList.toggle("hide",b!==box));$("#gate").classList.remove("hide");$("#app").classList.add("hide")}
+function showGate(box){["loginBox","pickBox","fraseBox","denyBox"].forEach(b=>$("#"+b).classList.toggle("hide",b!==box));$("#gate").classList.remove("hide");$("#app").classList.add("hide")}
 function deny(msg){$("#denyErr").textContent=msg;showGate("denyBox")}
 
 auth.onAuthStateChanged(async u=>{
   S.unsub.forEach(f=>f());S.unsub=[];
-  if(!u){S.uid=null;S.quien=null;showGate("loginBox");return}
+  if(!u){if(S.uid){try{sessionStorage.removeItem("casa-llave-"+S.uid)}catch(e){}}LLAVE=null;S.uid=null;S.quien=null;showGate("loginBox");return}
   S.uid=u.uid;
   try{
     const m=await ref.miembros.get();
@@ -830,9 +908,12 @@ async function start(quien,u){
   S.quien=quien;S.email=u.email;
   $("#whoName").textContent=NOMBRE[quien];$("#whoName").title=u.email;$("#btnOut").title="Salir de "+u.email;
   $("#cuentaEmail").textContent=u.email;
-  $("#gate").classList.add("hide");$("#app").classList.remove("hide");
   await seed();
   await parchar();
+  S.config={...DEFAULT_CONFIG,...((await ref.config.get()).data()||{})};
+  await llaveGuardada();
+  if(!LLAVE)await pedirFrase();
+  $("#gate").classList.add("hide");$("#app").classList.remove("hide");
   listen();
   if(!S.booted){S.booted=true;bootUI()}
 }
@@ -867,16 +948,35 @@ async function parchar(){
 }
 
 function setSync(ok){$("#sync").innerHTML=`<i class="punto ${ok?"":"off"}"></i>${ok?"en la nube":"guardando"}`}
+/* lo personal de config (sueldos, renta de hoy, ahorro) se guarda cifrado */
+const PRIV=["ingA","ingR","valesR","escRafa","escAndrea","rentaActual","ahorrado"];
+async function guardarConfig(obj){
+  const pub={};let priv=false;
+  for(const [k,v] of Object.entries(obj)){if(PRIV.includes(k))priv=true;else pub[k]=v}
+  if(priv&&LLAVE){pub.privado=await cifrar(Object.fromEntries(PRIV.map(k=>[k,S.config[k]??null])));PRIV.forEach(k=>pub[k]=null)}
+  if(Object.keys(pub).length)return ref.config.set(pub,{merge:true});
+}
+let cfgV=0;
+async function aplicarConfig(raw){
+  const v=++cfgV,p=raw.privado&&LLAVE?await descifrar(raw.privado):null;if(v!==cfgV)return;
+  S.config={...DEFAULT_CONFIG,...raw};
+  PRIV.forEach(k=>{if(p&&p[k]!==undefined&&p[k]!==null)S.config[k]=p[k];else if(S.config[k]===null)S.config[k]=DEFAULT_CONFIG[k]});
+  if(!Array.isArray(S.config.calendarios))S.config.calendarios=[];
+  else if(!S.config.calendarios.some(c=>c.de===S.quien)&&S.email&&/@gmail\.com$/i.test(S.email))
+    ref.config.set({calendarios:[...S.config.calendarios,{id:S.email,nombre:"Personal",de:S.quien,color:S.quien==="rafa"?"#F4511E":"#0B8043"}]},{merge:true});
+  fillInputs();fillEsc();fillEscA();renderCalc();renderDepas();renderMarkers();renderCal();renderInicio();
+  if(S.booted)pintarLlave();
+  /* lo que todavía esté sin cifrar en la nube se cifra y se borra */
+  if(LLAVE&&PRIV.some(k=>raw[k]!==null&&raw[k]!==undefined))guardarConfig(Object.fromEntries(PRIV.map(k=>[k,S.config[k]])));
+}
 function listen(){
   const meta={includeMetadataChanges:true},pw=s=>{if(s.metadata)setSync(!s.metadata.hasPendingWrites)};
-  S.unsub.push(ref.config.onSnapshot(meta,s=>{pw(s);S.config={...DEFAULT_CONFIG,...(s.data()||{})};
-    if(!Array.isArray(S.config.calendarios))S.config.calendarios=[];
-    else if(!S.config.calendarios.some(c=>c.de===S.quien)&&S.email&&/@gmail\.com$/i.test(S.email))
-      ref.config.set({calendarios:[...S.config.calendarios,{id:S.email,nombre:"Personal",de:S.quien,color:S.quien==="rafa"?"#F4511E":"#0B8043"}]},{merge:true});
-    fillInputs();fillEsc();fillEscA();renderCalc();renderDepas();renderMarkers();renderCal();renderInicio()}));
+  S.unsub.push(ref.config.onSnapshot(meta,s=>{pw(s);aplicarConfig(s.data()||{})}));
   S.unsub.push(ref.depas.onSnapshot(meta,s=>{pw(s);S.depas=s.docs.map(d=>({id:d.id,...d.data()}));renderDepas();renderMarkers();renderInicio()}));
   S.unsub.push(ref.pend.onSnapshot(meta,s=>{pw(s);S.pend=s.docs.map(d=>({id:d.id,...d.data()}));renderPend();renderInicio()}));
   S.unsub.push(ref.cartas.onSnapshot(meta,s=>{pw(s);S.cartas=s.docs.map(d=>({id:d.id,...d.data()}));renderCartas()}));
+  S.unsub.push(ref.chat.onSnapshot(meta,s=>{S.chat=s.docs.map(d=>({id:d.id,...d.data()}));renderChat()}));
+  S.unsub.push(ref.diario.onSnapshot(meta,s=>{S.diario=s.docs.map(d=>({id:d.id,...d.data()}));renderDiario()}));
   S.unsub.push(ref.presencia.onSnapshot(meta,s=>{S.pres={};s.docs.forEach(d=>S.pres[d.id]=d.data());renderPres()}));
   S.unsub.push(ref.cosas.onSnapshot(meta,s=>{pw(s);S.cosas=s.docs.map(d=>({id:d.id,...d.data()}));renderCasa()}));
   S.unsub.push(ref.deseos.onSnapshot(meta,s=>{pw(s);S.deseos=s.docs.map(d=>({id:d.id,...d.data()}));
@@ -893,6 +993,7 @@ function showPanel(p){
   $$(".panel").forEach(x=>x.classList.toggle("on",x.id==="p-"+p));
   $$("#tabs .tab").forEach(t=>t.classList.toggle("on",t.dataset.p===p));
   if(location.hash!=="#"+p)history.replaceState(null,"","#"+p);
+  if(p==="cartas")setTimeout(leido,50);
   if(p==="mapa"&&map)setTimeout(()=>{map.invalidateSize();if(!map._ajustado){map._ajustado=1;verZona()}},30);
   scrollTo({top:0});
 }
@@ -974,7 +1075,7 @@ function renderPres(){
   if(!S.booted||!S.quien)return;const o=otro(),p=S.pres[o],n=NOMBRE[o];
   const on=p&&p.activo&&Date.now()-p.t<150000;
   const tx=on?`${n} está aquí`:p?`${n} entró ${hace(p.t)}`:`${n} todavía no entra`;
-  for(const q of ["#presPie","#presIni"]){const el=$(q);el.classList.toggle("on",!!on);el.innerHTML=`<i></i>${tx}`}
+  for(const q of ["#presPie","#presIni","#presChat"]){const el=$(q);el.classList.toggle("on",!!on);el.innerHTML=`<i></i>${tx}`}
 }
 let presT=null;
 function latido(activo){if(S.quien)ref.presencia.doc(S.quien).set({t:Date.now(),activo},{merge:true}).catch(()=>{})}
@@ -982,6 +1083,142 @@ function presEvents(){
   latido(true);presT=setInterval(()=>{if(document.visibilityState==="visible")latido(true);renderPres()},60000);
   document.addEventListener("visibilitychange",()=>latido(document.visibilityState==="visible"));
   addEventListener("pagehide",()=>latido(false));
+}
+
+/* ---------- Cifrado: chat y diario ----------
+   La llave sale de una frase que solo saben los dos (PBKDF2 + AES-GCM).
+   En la nube solo queda texto cifrado; sin la frase nadie lo puede leer. */
+const te=new TextEncoder(),td=new TextDecoder();
+const b64=a=>{let s="";new Uint8Array(a).forEach(c=>s+=String.fromCharCode(c));return btoa(s)};
+const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+let LLAVE=null;const plano=new Map();
+async function derivar(frase,salt){
+  const base=await crypto.subtle.importKey("raw",te.encode(frase),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2",salt:unb64(salt),iterations:250000,hash:"SHA-256"},base,{name:"AES-GCM",length:256},true,["encrypt","decrypt"]);
+}
+async function cifrar(obj,k=LLAVE){const iv=crypto.getRandomValues(new Uint8Array(12));
+  return {iv:b64(iv),ct:b64(await crypto.subtle.encrypt({name:"AES-GCM",iv},k,te.encode(JSON.stringify(obj))))}}
+async function descifrar(d,k=LLAVE){
+  const id=d.iv+d.ct;if(k===LLAVE&&plano.has(id))return plano.get(id);
+  try{const v=JSON.parse(td.decode(await crypto.subtle.decrypt({name:"AES-GCM",iv:unb64(d.iv)},k,unb64(d.ct))));if(k===LLAVE)plano.set(id,v);return v}catch(e){return null}
+}
+const llaveLS=()=>"casa-llave-"+S.uid;
+async function llaveGuardada(){
+  if(LLAVE||!S.config.cifra)return;
+  try{const j=sessionStorage.getItem(llaveLS())||localStorage.getItem(llaveLS());if(!j)return;
+    const k=await crypto.subtle.importKey("jwk",JSON.parse(j),{name:"AES-GCM"},true,["encrypt","decrypt"]);
+    if(await descifrar(S.config.cifra.check,k)==="nuestra-casa")LLAVE=k}catch(e){}
+}
+function pintarLlave(){
+  const nec=S.nSeg!=="cartitas",nueva=!S.config.cifra;
+  $("#llave").classList.toggle("hide",!nec||!!LLAVE);
+  $("#llaveOlvidar").classList.toggle("hide",!LLAVE);
+  $("#llave2").classList.toggle("hide",!nueva);
+  $("#llaveTit").textContent=nueva?"Elijan una frase secreta":"Frase secreta";
+  $("#llaveTx").textContent=nueva?"Solo ustedes dos la saben. El chat y el diario se guardan cifrados con ella: si se olvida, no se pueden recuperar.":"La misma que eligieron juntos.";
+  $("#llaveBtn").textContent=nueva?"Guardar frase":"Abrir";
+  $$(".nsub").forEach(x=>x.classList.toggle("on",x.id==="n-"+S.nSeg&&(S.nSeg==="cartitas"||!!LLAVE)));
+  $$("#nSeg button").forEach(b=>b.classList.toggle("on",b.dataset.n===S.nSeg));
+}
+/* devuelve un texto de error, o nada si la frase abrió */
+async function abrirConFrase(f,f2,recordar){
+  if(f.length<8)return "Que tenga al menos 8 caracteres.";
+  let c=S.config.cifra,k;
+  if(!c){if(f!==f2)return "Las dos no son iguales.";
+    const salt=b64(crypto.getRandomValues(new Uint8Array(16)));k=await derivar(f,salt);
+    c={salt,check:await cifrar("nuestra-casa",k)};await ref.config.set({cifra:c},{merge:true});S.config.cifra=c}
+  else{k=await derivar(f,c.salt);if(await descifrar(c.check,k)!=="nuestra-casa")return "Esa no es la frase."}
+  LLAVE=k;plano.clear();
+  const j=JSON.stringify(await crypto.subtle.exportKey("jwk",k));
+  try{sessionStorage.setItem(llaveLS(),j);if(recordar)localStorage.setItem(llaveLS(),j);else localStorage.removeItem(llaveLS())}catch(e){}
+  return "";
+}
+function olvidarLlave(){try{localStorage.removeItem(llaveLS());sessionStorage.removeItem(llaveLS())}catch(e){}LLAVE=null;plano.clear()}
+/* toda la página pide la frase; sin ella no se abre */
+function pedirFrase(){return new Promise(res=>{
+  const nueva=!S.config.cifra;
+  $("#fTit").textContent=nueva?"Elijan una frase secreta":"Frase secreta";
+  $("#fTx").textContent=nueva?"Solo ustedes dos la saben. Abre la página y cifra los sueldos, el chat y el diario. Si se olvida, no se puede recuperar.":"La misma que eligieron juntos.";
+  $("#f2l").classList.toggle("hide",!nueva);$("#fBtn").textContent=nueva?"Guardar y entrar":"Entrar";
+  const ir=async()=>{$("#fErr").textContent="";$("#fBtn").disabled=true;
+    const e=await abrirConFrase($("#f1").value,$("#f2").value,$("#fRec").checked);$("#fBtn").disabled=false;
+    if(e)return $("#fErr").textContent=e;$("#f1").value=$("#f2").value="";res()};
+  $("#fBtn").onclick=ir;$("#f1").onkeydown=$("#f2").onkeydown=e=>{if(e.key==="Enter")ir()};
+  $("#fOut").onclick=()=>auth.signOut();
+  showGate("fraseBox");setTimeout(()=>$("#f1").focus(),50);
+})}
+function llaveEvents(){
+  $("#nSeg").addEventListener("click",e=>{const b=e.target.closest("[data-n]");if(b){S.nSeg=b.dataset.n;pintarLlave();if(S.nSeg==="chat")leido()}});
+  const abrir=async()=>{
+    const e=await abrirConFrase($("#llave1").value,$("#llave2").value,$("#llaveRec").checked);
+    if(e)return $("#llaveErr").textContent=e;$("#llave1").value=$("#llave2").value="";
+    pintarLlave();renderChat();renderDiario();
+  };
+  $("#llaveBtn").onclick=abrir;$("#llave1").addEventListener("keydown",e=>{if(e.key==="Enter")abrir()});
+  $("#llaveOlvidar").onclick=()=>{if(confirm("En este aparato se volverá a pedir la frase."))olvidarLlave();location.reload()};
+}
+
+/* ---------- Chat ---------- */
+const hora=t=>new Date(t).toLocaleTimeString("es-MX",{hour:"numeric",minute:"2-digit"});
+const diaLargo=t=>new Date(t).toLocaleDateString("es-MX",{weekday:"long",day:"numeric",month:"long"});
+const leidoLS=()=>"casa-chat-leido-"+S.uid;
+function leido(){if(S.nSeg==="chat"&&$("#p-cartas").classList.contains("on")&&document.visibilityState==="visible"){try{localStorage.setItem(leidoLS(),String(Date.now()))}catch(e){}avisos()}}
+function avisos(){
+  let lt=0;try{lt=+localStorage.getItem(leidoLS())||0}catch(e){}
+  const nuevos=S.chat.filter(m=>m.de!==S.quien&&m.t>lt).length;
+  const cartas=S.cartas.filter(c=>c.para===S.quien&&!c.abierta&&!(c.abrirDesde&&Date.now()<c.abrirDesde)).length;
+  $("#cartaPunto").classList.toggle("hide",!nuevos&&!cartas);
+  S.chatNuevos=nuevos;
+}
+let chatV=0;
+async function renderChat(){
+  if(!S.booted||!S.quien)return;avisos();renderAvisoIni();if(!LLAVE)return;
+  const v=++chatV,ms=[...S.chat].sort((a,b)=>a.t-b.t).slice(-300);
+  const txt=await Promise.all(ms.map(m=>descifrar(m)));if(v!==chatV)return;
+  const box=$("#msgs"),abajo=box.scrollHeight-box.scrollTop-box.clientHeight<80;let dia="";
+  box.innerHTML=ms.map((m,i)=>{const d=new Date(m.t).toDateString(),sep=d!==dia?`<div class="dia-sep">${diaLargo(m.t)}</div>`:"";dia=d;
+    return sep+`<div class="msg ${m.de} ${m.de===S.quien?"yo":"el"}">${txt[i]===null?"<i>No se pudo leer</i>":esc(txt[i])}<small>${hora(m.t)}</small></div>`}).join("")||`<div class="vacio">Todavía no hay mensajes.</div>`;
+  if(abajo||ms.length&&ms[ms.length-1].de===S.quien)box.scrollTop=box.scrollHeight;
+  leido();
+}
+function chatEvents(){
+  const t=$("#mText");
+  const enviar=async()=>{const v=t.value.trim();if(!v||!LLAVE)return;t.value="";t.style.height="";
+    ref.chat.doc().set({de:S.quien,t:Date.now(),...await cifrar(v)});$("#msgs").scrollTop=1e9};
+  $("#mSend").onclick=enviar;
+  t.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();enviar()}});
+  t.addEventListener("input",()=>{t.style.height="auto";t.style.height=Math.min(140,t.scrollHeight)+"px"});
+  document.addEventListener("visibilitychange",leido);
+}
+
+/* ---------- Diario de los dos ---------- */
+const ANIMOS=["Bonito","Tranquilo","Cansado","Difícil","Lo resolvimos juntos"];
+const hoyISO=()=>{const d=new Date(),z=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`};
+let diarioV=0,diarioPlano={};
+async function renderDiario(){
+  if(!S.booted||!LLAVE)return;const v=++diarioV;
+  const ents=await Promise.all(S.diario.map(async e=>({...e,v:await descifrar(e)})));if(v!==diarioV)return;
+  diarioPlano={};ents.forEach(e=>diarioPlano[e.id]=e);
+  const fechas=[...new Set(ents.map(e=>e.fecha))].sort().reverse();
+  const lado=(f,q)=>{const e=ents.find(x=>x.fecha===f&&x.de===q);
+    return `<div class="lado-d ${q}"><b>${NOMBRE[q]}</b>${e&&e.v?`${e.v.animo?`<span class="animo">${esc(e.v.animo)}</span>`:""}<p>${esc(e.v.texto)}</p>`:`<span class="suave">Todavía no escribe.</span>`}</div>`};
+  $("#dias").innerHTML=fechas.map(f=>`<div class="dia"><h4>${diaLargo(new Date(f+"T12:00"))}</h4><div class="dos">${lado(f,"andrea")}${lado(f,"rafa")}</div></div>`).join("")||`<div class="vacio">Cada quien escribe su lado del día. Aquí se ven juntos.</div>`;
+  cargarDia();
+}
+function cargarDia(){
+  const e=diarioPlano[$("#dFecha").value+"-"+S.quien];
+  if(document.activeElement!==$("#dTexto"))$("#dTexto").value=e&&e.v?e.v.texto:"";
+  S.dAnimo=e&&e.v?e.v.animo||null:null;
+  $$("#dAnimos .pill").forEach(b=>b.classList.toggle("on",b.dataset.a===S.dAnimo));
+}
+function diarioEvents(){
+  $("#dFecha").value=hoyISO();
+  $("#dAnimos").innerHTML=ANIMOS.map(a=>`<button class="pill" data-a="${a}">${a}</button>`).join("");
+  $("#dAnimos").addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)return;S.dAnimo=S.dAnimo===b.dataset.a?null:b.dataset.a;$$("#dAnimos .pill").forEach(x=>x.classList.toggle("on",x.dataset.a===S.dAnimo))});
+  $("#dFecha").addEventListener("change",()=>{$("#dTexto").blur();cargarDia()});
+  $("#dGuardar").onclick=async()=>{const t=$("#dTexto").value.trim(),f=$("#dFecha").value;if(!t||!f||!LLAVE)return;
+    await ref.diario.doc(f+"-"+S.quien).set({fecha:f,de:S.quien,t:Date.now(),...await cifrar({texto:t,animo:S.dAnimo})});
+    $("#dGuardar").textContent="Guardado";setTimeout(()=>$("#dGuardar").textContent="Guardar",1500)};
 }
 
 /* ---------- Cartitas ---------- */
@@ -1003,10 +1240,14 @@ function renderCartas(){
   const rec=S.cartas.filter(c=>c.para===yo).sort(ord),env=S.cartas.filter(c=>c.de===yo).sort(ord);
   $("#cRecibidas").innerHTML=rec.map(c=>sobreHTML(c,false)).join("")||`<div class="vacio">Nada todavía.</div>`;
   $("#cEnviadas").innerHTML=env.map(c=>sobreHTML(c,true)).join("")||`<div class="vacio">Nada todavía.</div>`;
-  const listas=rec.filter(c=>!c.abierta&&!(c.abrirDesde&&Date.now()<c.abrirDesde));
-  $("#cartaPunto").classList.toggle("hide",!listas.length);
-  const n=NOMBRE[otro()];
-  $("#avisoCarta").innerHTML=listas.length?`<button class="carta-aviso" data-ir="cartas"><svg class="svgi"><use href="#i-sobre"/></svg>${n} te dejó ${listas.length>1?listas.length+" cartitas":listas[0].tipo==="regalo"?"un regalo":"una cartita"}</button>`:"";
+  avisos();renderAvisoIni();
+}
+function renderAvisoIni(){
+  const n=NOMBRE[otro()],listas=S.cartas.filter(c=>c.para===S.quien&&!c.abierta&&!(c.abrirDesde&&Date.now()<c.abrirDesde));
+  const b=[];
+  if(listas.length)b.push(`<button class="carta-aviso" data-ir="cartas" data-seg="cartitas"><svg class="svgi"><use href="#i-sobre"/></svg>${n} te dejó ${listas.length>1?listas.length+" cartitas":listas[0].tipo==="regalo"?"un regalo":"una cartita"}</button>`);
+  if(S.chatNuevos)b.push(`<button class="carta-aviso" data-ir="cartas" data-seg="chat"><svg class="svgi"><use href="#i-corazon"/></svg>${n} te escribió</button>`);
+  $("#avisoCarta").innerHTML=b.join(" ");
 }
 function proximoMediodia(){const d=new Date();if(d.getHours()>=12)d.setDate(d.getDate()+1);d.setHours(12,0,0,0);
   const z=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T12:00`}
@@ -1042,7 +1283,7 @@ function bindInputs(){
     const k=el.dataset.k;
     S.config[k]=el.type==="checkbox"?el.checked:el.type==="date"?el.value:(+el.value||0);
     renderCalc();renderDepas();renderInicio();
-    clearTimeout(saveT);saveT=setTimeout(()=>{setSync(false);ref.config.set(Object.fromEntries($$("#p-gastos [data-k]").map(i=>[i.dataset.k,S.config[i.dataset.k]])),{merge:true})},600);
+    clearTimeout(saveT);saveT=setTimeout(()=>{setSync(false);guardarConfig(Object.fromEntries($$("#p-gastos [data-k]").map(i=>[i.dataset.k,S.config[i.dataset.k]])))},600);
   }));
 }
 function renderCalc(){
@@ -1115,7 +1356,7 @@ function fillEscA(){
 function guardarEscA(l,activo){
   S.config.escAndrea=l;S.config.escActivoA=activo;S.config.ingA=+escActualA().neto||0;
   fillEscA();renderCalc();renderDepas();renderInicio();
-  clearTimeout(escAT);escAT=setTimeout(()=>{setSync(false);ref.config.set({escAndrea:l,escActivoA:activo,ingA:S.config.ingA},{merge:true})},500);
+  clearTimeout(escAT);escAT=setTimeout(()=>{setSync(false);guardarConfig({escAndrea:l,escActivoA:activo,ingA:S.config.ingA})},500);
 }
 function elegirLugarA(k){
   const o=escsA().find(x=>lugarA(x)===k);if(o){if(o.id!==escActualA().id)guardarEscA(escsA(),o.id);return}
@@ -1133,7 +1374,7 @@ function escEventsA(){
 function guardarEsc(l,activo){
   S.config.escRafa=l;S.config.escActivo=activo;const a=escActual();S.config.ingR=+a.neto||0;S.config.valesR=+a.vales||0;
   fillEsc();renderCalc();renderDepas();renderMarkers();renderInicio();
-  clearTimeout(escT);escT=setTimeout(()=>{setSync(false);ref.config.set({escRafa:l,escActivo:activo,ingR:S.config.ingR,valesR:S.config.valesR},{merge:true})},500);
+  clearTimeout(escT);escT=setTimeout(()=>{setSync(false);guardarConfig({escRafa:l,escActivo:activo,ingR:S.config.ingR,valesR:S.config.valesR})},500);
 }
 function escEvents(){
   $("#escs").addEventListener("click",e=>{const b=e.target.closest("[data-e]");if(!b)return;
@@ -1440,12 +1681,12 @@ function bootUI(){
   const opt=o=>Object.entries(o).map(([k,v])=>`<option value="${k}">${v}</option>`).join("");
   ["luz","elevador","cajon","mascotas","balcon","cocina"].forEach(k=>$("#dForm").elements[k].innerHTML=opt(SINO));
   $("#dForm").elements.estado.innerHTML=opt(ESTADOS);
-  bindInputs();escEvents();escEventsA();cartaEvents();presEvents();deseoEvents();listEvents();calEvents();buildMap();lugaresEvents();
+  bindInputs();escEvents();escEventsA();cartaEvents();presEvents();llaveEvents();chatEvents();diarioEvents();deseoEvents();listEvents();calEvents();buildMap();lugaresEvents();
   $("#rentRange").addEventListener("input",ev=>{rentaSim=+ev.target.value;renderCalc()});
   $("#tabs").addEventListener("click",e=>{const t=e.target.closest(".tab");if(t)showPanel(t.dataset.p)});
   addEventListener("hashchange",()=>showPanel(location.hash.slice(1)));
   document.addEventListener("click",e=>{
-    const i=e.target.closest("[data-ir]");if(i){showPanel(i.dataset.ir);return}
+    const i=e.target.closest("[data-ir]");if(i){if(i.dataset.seg){S.nSeg=i.dataset.seg;pintarLlave()}showPanel(i.dataset.ir);if(i.dataset.ir==="cartas")leido();return}
     const g=e.target.closest("[data-goto]");if(g){e.preventDefault();S.filtro="todos";showPanel("depas");renderDepas();setTimeout(()=>{const c=document.getElementById("d-"+g.dataset.goto);c&&c.scrollIntoView({block:"start"})},50)}});
   $("#depaList").addEventListener("click",depaAction);
   $("#depaList").addEventListener("scroll",marcarCarr,{passive:true});
@@ -1457,6 +1698,7 @@ function bootUI(){
     if($("#p-mapa").classList.contains("on"))setTimeout(()=>map.invalidateSize(),30)});
   showPanel(location.hash.slice(1)||"inicio");
   fillInputs();fillEsc();fillEscA();renderCalc();renderDepas();renderPend();renderCasa();renderCal();renderInicio();renderDeseos();renderCartas();renderPres();
+  pintarLlave();llaveGuardada().then(()=>{pintarLlave();renderChat();renderDiario()});
 }
 </script>
 </body>
