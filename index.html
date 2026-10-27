@@ -824,7 +824,14 @@ const SEED_DEPAS=[
   mkDepa("golfo-de-california-32",{nombre:"Golfo de California 32",colonia:"Tacuba",metros:"Tacuba",renta:16800,incluye:"mantenimiento",elevador:"si",cajon:"si",mascotas:"si",poliza:3898,trasladoA:"15 min en bici, aprox.",trasladoR:"10 min en metro, aprox.",link:"https://www.facebook.com/marketplace/item/1411992497171405",lat:19.4598,lng:-99.1828,
     pros:["Elevador","Cajón","Acepta mascotas","Póliza de $7,796 compartida con la dueña"],contras:["Arriba de la renta ideal"]}),
   mkDepa("observatorio-homie",{nombre:"Observatorio (Homie)",colonia:"Observatorio",metros:"Constituyentes",renta:13800,incluye:"mantenimiento",m2:46,mascotas:"si",poliza:0,trasladoA:"20 min, Línea 7 a Polanco, aprox.",trasladoR:"35 min, Línea 7 y Línea 2, aprox.",link:"",lat:19.4118,lng:-99.1918,
-    pros:["La más barata","Sin aval","Acepta mascotas"],contras:["46 m², quizá una sola recámara","Traslado largo para Rafa"]})
+    pros:["La más barata","Sin aval","Acepta mascotas"],contras:["46 m², quizá una sola recámara","Traslado largo para Rafa"]}),
+  mkDepa("diaz-miron-205",{nombre:"Díaz Mirón 205",colonia:"Santa María la Ribera",metros:"San Cosme, Buenavista",renta:16000,incluye:"",m2:55,recamaras:2,piso:"2",elevador:"no",cajon:"no",mascotas:"si",balcon:"si",lugar:"herdez",
+    trasladoA:"15 min en bici, aprox.",trasladoR:"30 min, Línea 2 desde San Cosme, aprox.",trasladoF:"1 h 05 min, Línea 2 a Ermita y Línea 12 a Calle 11, aprox.",
+    link:"https://departamento.mercadolibre.com.mx/MLM-6373653054-departamento-en-renta-en-santa-maria-la-ribera-de-2-recamaras-con-balcon-_JM",lat:19.4490,lng:-99.1588,
+    foto:"https://http2.mlstatic.com/D_NQ_NP_715755-MLM119090080511_102026-O-departamento-en-renta-en-santa-maria-la-ribera-de-2-recamaras-con-balcon.webp",
+    votos:{andrea:"si"},
+    pros:["El favorito de Andrea","2 recámaras y balcón","A dos cuadras del Kiosco Morisco","Acepta mascotas","Edificio chico de dos pisos, con acceso por código","Lavandería en la terraza"],
+    contras:["Disponible desde noviembre de 2026; la búsqueda es de febrero a mayo de 2027","2º piso sin elevador","Sin estacionamiento (hay pensión a 50 m)","Servicios no incluidos","Un solo baño"]})
 ];
 const SEED_PEND=[
   ["Fecha de mudanza","Mudanza","Buscar entre febrero y mayo de 2027"],
@@ -842,7 +849,7 @@ const SEED_PEND=[
 
 
 /* Correcciones con datos de los anuncios (oct 2026); se aplican una sola vez a lo que ya está en la nube */
-const PARCHE=4;
+const PARCHE=5;
 const PARCHE_DEPAS={
   "lago-mayor-30":{recamaras:2,piso:"2",lat:19.4510,lng:-99.1866,pros:["2 recámaras con clóset","Elevador","Cajón techado","Acepta perros y gatos","Balcón interior","Frente a un mercado","Vigilancia 24/7"],contras:["Un solo baño"]},
   "cedro-62":{recamaras:2,lat:19.4495,lng:-99.1615,pros:["La colonia favorita de Andrea","2 recámaras, 65 m²","Cocina integral con parrilla y campana","Metro Normal, Línea 2 directa a Cuatro Caminos"],contras:["Sin estacionamiento"]},
@@ -861,6 +868,9 @@ const PARCHE_DEPAS2={
 };
 /* Parche 3: ya no hay zona ideal en el mapa */
 const PARCHE_DEPAS3={"observatorio-homie":{contras:["46 m², quizá una sola recámara","Traslado largo para Rafa"]}};
+/* Parche 5: Díaz Mirón 205 es el favorito de Andrea en Santa María; Cedro 62 ya no lleva esa etiqueta */
+const PARCHE_DEPAS5={"cedro-62":{pros:["Santa María la Ribera","2 recámaras, 65 m²","Cocina integral con parrilla y campana","Metro Normal, Línea 2 directa a Cuatro Caminos"]}};
+const NUEVOS5=["diaz-miron-205"];
 /* Parche 4: Rafa llega a Fermic por Metro Calle 11, Línea 12 */
 const PARCHE_DEPAS4={
   "lago-mayor-30":{trasladoF:"1 h 10 min, Línea 2 a Ermita y Línea 12 a Calle 11, aprox."},
@@ -930,7 +940,7 @@ async function seed(){
     if(c.exists)return;
     const b=fdb.batch();
     b.set(ref.config,{...DEFAULT_CONFIG,parche:PARCHE,creado:Date.now()});
-    SEED_DEPAS.forEach((d,i)=>{const {id,...rest}=d;b.set(ref.depas.doc(id),{...rest,...(PARCHE_DEPAS[id]||{}),...(PARCHE_DEPAS2[id]||{}),...(PARCHE_DEPAS3[id]||{}),...(PARCHE_DEPAS4[id]||{}),creadoPor:"andrea",creado:Date.now()+i})});
+    SEED_DEPAS.forEach((d,i)=>{const {id,...rest}=d;b.set(ref.depas.doc(id),{...rest,...(PARCHE_DEPAS[id]||{}),...(PARCHE_DEPAS2[id]||{}),...(PARCHE_DEPAS3[id]||{}),...(PARCHE_DEPAS4[id]||{}),...(PARCHE_DEPAS5[id]||{}),creadoPor:"andrea",creado:Date.now()+i})});
     SEED_PEND.forEach(([texto,cat,nota],i)=>b.set(ref.pend.doc("p"+i),{texto,cat,nota,hecho:false,por:"andrea",creado:Date.now()+i}));
     await b.commit();
   }catch(e){console.warn("seed",e)}
@@ -942,8 +952,10 @@ async function parchar(){
     if((d.parche||0)<PARCHE){
       /* cada parche se aplica una vez, para no pisar lo que ya se editó */
       const b=fdb.batch();
-      for(const [n,lote] of [[1,PARCHE_DEPAS],[2,PARCHE_DEPAS2],[3,PARCHE_DEPAS3],[4,PARCHE_DEPAS4]])if((d.parche||0)<n)
+      for(const [n,lote] of [[1,PARCHE_DEPAS],[2,PARCHE_DEPAS2],[3,PARCHE_DEPAS3],[4,PARCHE_DEPAS4],[5,PARCHE_DEPAS5]])if((d.parche||0)<n)
         for(const [id,o] of Object.entries(lote)){if((await ref.depas.doc(id).get()).exists)b.update(ref.depas.doc(id),o)}
+      /* depas nuevos que se agregan una sola vez */
+      if((d.parche||0)<5)for(const id of NUEVOS5){if(!(await ref.depas.doc(id).get()).exists){const {id:_,...rest}=SEED_DEPAS.find(x=>x.id===id);b.set(ref.depas.doc(id),{...rest,creadoPor:"andrea",creado:Date.now()})}}
       await b.commit();upd.parche=PARCHE;
     }
     /* antes los calendarios eran {andrea:correo, rafa:correo}; ahora son una lista */
