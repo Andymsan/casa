@@ -133,7 +133,6 @@ main{padding:44px var(--pad) 90px;min-width:0}
 .leyenda span{display:inline-flex;align-items:center;gap:8px}
 .pt{width:11px;height:11px;border-radius:50%;display:inline-block;box-sizing:border-box}
 .leyenda .ley{display:inline-flex;align-items:center;gap:8px;color:inherit;font:inherit;text-decoration:none}
-.zn{width:16px;height:10px;border:1.5px dashed var(--andrea);border-radius:3px;display:inline-block}
 .leaflet-container{font-family:var(--sans);background:var(--papel2)}
 .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--hoja);color:var(--tinta);border-radius:14px;box-shadow:0 6px 24px rgba(58,46,39,.18)}
 .leaflet-popup-content{margin:12px 14px;font-size:15.7px;line-height:1.45}
@@ -438,7 +437,6 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
       <button class="lnk ley" data-lugar="fermic"><i class="pt" style="background:var(--rafa)"></i>Fermic, hoy</button>
       <button class="lnk ley" data-lugar="herdez"><i class="pt" style="border:2px solid var(--rafa)"></i>Herdez, propuesta</button>
       <span><i class="pt" style="background:var(--tinta)"></i>Depas</span>
-      <span><i class="zn"></i>Zona ideal</span>
     </div>
   </section>
 
@@ -640,7 +638,7 @@ const SEED_DEPAS=[
   mkDepa("golfo-de-california-32",{nombre:"Golfo de California 32",colonia:"Tacuba",metros:"Tacuba",renta:16800,incluye:"mantenimiento",elevador:"si",cajon:"si",mascotas:"si",poliza:3898,trasladoA:"15 min en bici, aprox.",trasladoR:"10 min en metro, aprox.",link:"https://www.facebook.com/marketplace/item/1411992497171405",lat:19.4598,lng:-99.1828,
     pros:["Elevador","Cajón","Acepta mascotas","Póliza de $7,796 compartida con la dueña"],contras:["Arriba de la renta ideal"]}),
   mkDepa("observatorio-homie",{nombre:"Observatorio (Homie)",colonia:"Observatorio",metros:"Constituyentes",renta:13800,incluye:"mantenimiento",m2:46,mascotas:"si",poliza:0,trasladoA:"20 min, Línea 7 a Polanco, aprox.",trasladoR:"35 min, Línea 7 y Línea 2, aprox.",link:"",lat:19.4118,lng:-99.1918,
-    pros:["La más barata","Sin aval","Acepta mascotas"],contras:["46 m², quizá una sola recámara","Fuera de la zona ideal","Traslado largo para Rafa"]})
+    pros:["La más barata","Sin aval","Acepta mascotas"],contras:["46 m², quizá una sola recámara","Traslado largo para Rafa"]})
 ];
 const SEED_PEND=[
   ["Fecha de mudanza","Mudanza","Buscar entre febrero y mayo de 2027"],
@@ -658,7 +656,7 @@ const SEED_PEND=[
 
 
 /* Correcciones con datos de los anuncios (oct 2026); se aplican una sola vez a lo que ya está en la nube */
-const PARCHE=2;
+const PARCHE=3;
 const PARCHE_DEPAS={
   "lago-mayor-30":{recamaras:2,piso:"2",lat:19.4510,lng:-99.1866,pros:["2 recámaras con clóset","Elevador","Cajón techado","Acepta perros y gatos","Balcón interior","Frente a un mercado","Vigilancia 24/7"],contras:["Un solo baño"]},
   "cedro-62":{recamaras:2,lat:19.4495,lng:-99.1615,pros:["La colonia favorita de Andrea","2 recámaras, 65 m²","Cocina integral con parrilla y campana","Metro Normal, Línea 2 directa a Cuatro Caminos"],contras:["Sin estacionamiento"]},
@@ -675,6 +673,8 @@ const PARCHE_DEPAS2={
   "golfo-de-california-32":{trasladoF:"1 h 20 min, Línea 2 y Línea 8, aprox."},
   "observatorio-homie":{trasladoF:"1 h 15 min, Línea 7, Línea 1 y Línea 8, aprox."}
 };
+/* Parche 3: ya no hay zona ideal en el mapa */
+const PARCHE_DEPAS3={"observatorio-homie":{contras:["46 m², quizá una sola recámara","Traslado largo para Rafa"]}};
 
 const S={uid:null,quien:null,config:{...DEFAULT_CONFIG},depas:[],pend:[],cosas:[],deseos:null,filtro:"activos",casaTab:"despensa",calModo:"WEEK",calColor:GCOLORES[0],unsub:[],booted:false};
 
@@ -742,7 +742,7 @@ async function parchar(){
     if((d.parche||0)<PARCHE){
       /* cada parche se aplica una vez, para no pisar lo que ya se editó */
       const b=fdb.batch();
-      for(const [n,lote] of [[1,PARCHE_DEPAS],[2,PARCHE_DEPAS2]])if((d.parche||0)<n)
+      for(const [n,lote] of [[1,PARCHE_DEPAS],[2,PARCHE_DEPAS2],[3,PARCHE_DEPAS3]])if((d.parche||0)<n)
         for(const [id,o] of Object.entries(lote)){if((await ref.depas.doc(id).get()).exists)b.update(ref.depas.doc(id),o)}
       await b.commit();upd.parche=PARCHE;
     }
@@ -1157,7 +1157,6 @@ function buildMap(){
   L.polyline(METRO.filter(m=>m[3]==="2").map(m=>[m[1],m[2]]),{color:lines["2"],weight:3,opacity:.45}).addTo(map);
   L.polyline(METRO.filter(m=>m[3]==="7").map(m=>[m[1],m[2]]),{color:lines["7"],weight:3,opacity:.45}).addTo(map);
   METRO.forEach(([n,la,ln,l])=>L.circleMarker([la,ln],{radius:4,color:lines[l]||"#888",weight:2,fillColor:"#fff",fillOpacity:1}).bindTooltip(n,{permanent:true,direction:"right",className:"metro"}).addTo(map));
-  L.polygon([[19.4610,-99.1905],[19.4585,-99.1780],[19.4470,-99.1640],[19.4415,-99.1680],[19.4360,-99.1790],[19.4440,-99.1880]],{color:css("--andrea"),weight:1.5,dashArray:"5 6",fillColor:css("--andrea"),fillOpacity:.1}).bindTooltip("Zona ideal",{sticky:true}).addTo(map);
   const work=(ll,c,html)=>L.circleMarker(ll,{radius:10,color:"#fff",weight:3,fillColor:c,fillOpacity:1}).bindPopup(html).addTo(map);
   work([19.4372,-99.1800],css("--andrea"),"<b>SEMARNAT</b><br>Ejército Nacional 223");
   LUGARES.fermic=work([19.3242,-99.0850],css("--rafa"),"<b>Fermic</b><br>Lebrija 873, Granjas Estrella<br>Donde trabaja Rafa hoy");
