@@ -131,7 +131,8 @@ main{padding:44px var(--pad) 90px;min-width:0}
 #mapa{height:min(72vh,720px);min-height:420px;border-radius:22px;border:1px solid var(--linea);z-index:1}
 .leyenda{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:14px;font-size:15.7px;color:var(--tinta2)}
 .leyenda span{display:inline-flex;align-items:center;gap:8px}
-.pt{width:11px;height:11px;border-radius:50%;display:inline-block}
+.pt{width:11px;height:11px;border-radius:50%;display:inline-block;box-sizing:border-box}
+.leyenda .ley{display:inline-flex;align-items:center;gap:8px;color:inherit;font:inherit;text-decoration:none}
 .zn{width:16px;height:10px;border:1.5px dashed var(--andrea);border-radius:3px;display:inline-block}
 .leaflet-container{font-family:var(--sans);background:var(--papel2)}
 .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--hoja);color:var(--tinta);border-radius:14px;box-shadow:0 6px 24px rgba(58,46,39,.18)}
@@ -430,11 +431,12 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
 
   <!-- Mapa -->
   <section class="panel" id="p-mapa">
-    <div class="cab"><div><h2>El mapa</h2><p>Entre la Línea 2 y la Línea 7: SEMARNAT en Anáhuac, Herdez en Cuatro Caminos.</p></div></div>
+    <div class="cab"><div><h2>El mapa</h2><p>SEMARNAT en Anáhuac. Rafa hoy trabaja en Fermic, en Iztapalapa; Herdez, en Cuatro Caminos, es una propuesta.</p></div></div>
     <div id="mapa"></div>
     <div class="leyenda">
       <span><i class="pt" style="background:var(--andrea)"></i>SEMARNAT</span>
-      <span><i class="pt" style="background:var(--rafa)"></i>Herdez</span>
+      <button class="lnk ley" data-lugar="fermic"><i class="pt" style="background:var(--rafa)"></i>Fermic, hoy</button>
+      <button class="lnk ley" data-lugar="herdez"><i class="pt" style="border:2px solid var(--rafa)"></i>Herdez, propuesta</button>
       <span><i class="pt" style="background:var(--tinta)"></i>Depas</span>
       <span><i class="zn"></i>Zona ideal</span>
     </div>
@@ -566,7 +568,7 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
     </div>
     <div class="g2">
       <label class="f"><span>Traslado de Andrea</span><input type="text" name="trasladoA"></label>
-      <label class="f"><span>Traslado de Rafa</span><input type="text" name="trasladoR"></label>
+      <label class="f"><span>Traslado de Rafa a Herdez</span><input type="text" name="trasladoR"></label>
     </div>
     <div class="g2">
       <label class="f"><span>Anuncio</span><input type="url" name="link"></label>
@@ -947,7 +949,7 @@ function depaCard(d){
       <div class="etis">${tags}</div>
       <dl class="kv">
         <dt>Andrea</dt><dd>${esc(d.trasladoA)||"—"}</dd>
-        <dt>Rafa</dt><dd>${esc(d.trasladoR)||"—"}</dd>
+        <dt>Rafa, a Herdez</dt><dd>${esc(d.trasladoR)||"—"}</dd>
         <dt>Entrada</dt><dd class="n">${mx(e.total)}</dd>
       </dl>
       <div class="pc"><div><span class="cap p">A favor</span><ul>${list(d.pros)}</ul></div><div><span class="cap c">En contra</span><ul>${list(d.contras)}</ul></div></div>
@@ -1122,7 +1124,7 @@ function mkMap(el,center,z){
   let fallos=0;esri.on("tileerror",()=>{if(++fallos===4){m.removeLayer(esri);L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,className:"tiles",attribution:"&copy; OpenStreetMap"}).addTo(m)}});
   return m;
 }
-let map=null,markers={},depaLayer=null;
+let map=null,markers={},depaLayer=null,LUGARES={};
 const ZONA_VISTA=[[19.4625,-99.2160],[19.4355,-99.1590]];
 const METRO=[["Cuatro Caminos",19.4596,-99.2159,"2"],["Panteones",19.4588,-99.2032,"2"],["Tacuba",19.4593,-99.1885,"2"],["Cuitláhuac",19.4573,-99.1813,"2"],["Popotla",19.4528,-99.1753,"2"],["Colegio Militar",19.4494,-99.1720,"2"],["Normal",19.4444,-99.1676,"2"],["San Cosme",19.4418,-99.1605,"2"],
   ["Refinería",19.4697,-99.1904,"7"],["Tacuba",19.4593,-99.1885,"7"],["San Joaquín",19.4457,-99.1917,"7"],["Polanco",19.4334,-99.1910,"7"],["Auditorio",19.4253,-99.1920,"7"],["Constituyentes",19.4120,-99.1915,"7"],["Tacubaya",19.4027,-99.1870,"7"],["Observatorio",19.3982,-99.2005,"1"]];
@@ -1135,10 +1137,18 @@ function buildMap(){
   L.polygon([[19.4610,-99.1905],[19.4585,-99.1780],[19.4470,-99.1640],[19.4415,-99.1680],[19.4360,-99.1790],[19.4440,-99.1880]],{color:css("--andrea"),weight:1.5,dashArray:"5 6",fillColor:css("--andrea"),fillOpacity:.1}).bindTooltip("Zona ideal",{sticky:true}).addTo(map);
   const work=(ll,c,html)=>L.circleMarker(ll,{radius:10,color:"#fff",weight:3,fillColor:c,fillOpacity:1}).bindPopup(html).addTo(map);
   work([19.4372,-99.1800],css("--andrea"),"<b>SEMARNAT</b><br>Ejército Nacional 223");
-  work([19.4587,-99.2128],css("--rafa"),"<b>Herdez</b><br>Metro Cuatro Caminos");
+  LUGARES.fermic=work([19.3242,-99.0850],css("--rafa"),"<b>Fermic</b><br>Lebrija 873, Granjas Estrella<br>Donde trabaja Rafa hoy");
+  LUGARES.herdez=L.circleMarker([19.4587,-99.2128],{radius:9,color:css("--rafa"),weight:3,fillColor:css("--hoja"),fillOpacity:1}).bindPopup("<b>Herdez</b><br>Metro Cuatro Caminos<br>Propuesta de trabajo").addTo(map);
   map.fitBounds(ZONA_VISTA,{padding:[20,20]});
   depaLayer=L.layerGroup().addTo(map);
   renderMarkers();
+}
+function lugaresEvents(){
+  document.querySelector("#p-mapa .leyenda").addEventListener("click",e=>{const b=e.target.closest("[data-lugar]");if(!b||!map)return;
+    const m=LUGARES[b.dataset.lugar];
+    /* Fermic queda lejos: se encuadra junto con la zona para ver la distancia */
+    if(b.dataset.lugar==="fermic")map.fitBounds([...ZONA_VISTA,m.getLatLng()],{padding:[30,30]});else map.setView(m.getLatLng(),15);
+    m.openPopup()});
 }
 function renderMarkers(){
   if(!depaLayer)return;depaLayer.clearLayers();markers={};
@@ -1156,7 +1166,7 @@ function bootUI(){
   const opt=o=>Object.entries(o).map(([k,v])=>`<option value="${k}">${v}</option>`).join("");
   ["luz","elevador","cajon","mascotas","balcon","cocina"].forEach(k=>$("#dForm").elements[k].innerHTML=opt(SINO));
   $("#dForm").elements.estado.innerHTML=opt(ESTADOS);
-  bindInputs();escEvents();deseoEvents();listEvents();calEvents();buildMap();
+  bindInputs();escEvents();deseoEvents();listEvents();calEvents();buildMap();lugaresEvents();
   $("#rentRange").addEventListener("input",ev=>{rentaSim=+ev.target.value;renderCalc()});
   $("#tabs").addEventListener("click",e=>{const t=e.target.closest(".tab");if(t)showPanel(t.dataset.p)});
   addEventListener("hashchange",()=>showPanel(location.hash.slice(1)));
