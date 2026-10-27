@@ -141,7 +141,7 @@ main{padding:44px var(--pad) 90px;min-width:0}
 .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--hoja);color:var(--tinta);border-radius:14px;box-shadow:0 6px 24px rgba(58,46,39,.18)}
 .leaflet-popup-content{margin:12px 14px;font-size:15.7px;line-height:1.45}
 .leaflet-popup-content b{font-family:var(--serif);font-size:20.2px;font-weight:500}
-.leaflet-tooltip.metro{background:transparent;border:0;box-shadow:none;color:var(--tinta2);font-size:13.5px;padding:0 0 0 4px;text-shadow:0 0 3px var(--papel),0 0 3px var(--papel)}
+.leaflet-tooltip.metro{background:transparent;border:0;box-shadow:none;color:var(--suave);opacity:.85!important;font-size:13.5px;padding:0 0 0 4px;text-shadow:0 0 3px var(--papel),0 0 3px var(--papel)}
 .leaflet-tooltip.metro:before{display:none}
 .sin-nombres .leaflet-tooltip.metro{display:none}
 .mb{width:16px;height:0;border-top:2px solid #c4312b;opacity:.6;display:inline-block}
@@ -1188,13 +1188,13 @@ const COLOR_METRO={"1":"#e9468f","2":"#0065b3","3":"#b0a32a","4":"#6fb7ae","5":"
 let redP=null;const CAPAS={metro:true,mb:false},capaLayer={};
 function dibujarRed(){
   if(!map.getPane("red")){map.createPane("red").style.zIndex=350}
-  const m=map;redP=redP||fetch("red.json").then(r=>r.json());
+  const m=map;redP=redP||fetch("red.json?v=2").then(r=>r.json());
   capaLayer.metro=L.layerGroup();capaLayer.mb=L.layerGroup();pintarCapas();
   redP.then(red=>{if(m!==map)return;const cm=capaLayer.metro,cb=capaLayer.mb;
-    red.mb.lineas.forEach(([,pts])=>L.polyline(pts,{pane:"red",color:"#c4312b",weight:2.5,opacity:.45,interactive:false}).addTo(cb));
-    red.metro.lineas.forEach(([l,pts])=>L.polyline(pts,{pane:"red",color:COLOR_METRO[l]||"#888",weight:3,opacity:.5,interactive:false}).addTo(cm));
-    red.mb.est.forEach(([n,la,ln,l])=>L.circleMarker([la,ln],{pane:"red",radius:2.5,color:"#c4312b",weight:1,fillColor:"#fff",fillOpacity:1}).bindTooltip(`${n} · Metrobús ${l}`).addTo(cb));
-    red.metro.est.forEach(([n,la,ln,l])=>L.circleMarker([la,ln],{pane:"red",radius:4,color:COLOR_METRO[l]||"#888",weight:2,fillColor:"#fff",fillOpacity:1}).bindTooltip(n,{permanent:true,direction:"right",className:"metro"}).addTo(cm));
+    red.mb.lineas.forEach(([,pts])=>L.polyline(pts,{pane:"red",color:"#c4312b",weight:2.5,opacity:.25,interactive:false}).addTo(cb));
+    red.metro.lineas.forEach(([l,pts])=>L.polyline(pts,{pane:"red",color:COLOR_METRO[l]||"#888",weight:3,opacity:.35,interactive:false,lineCap:"round"}).addTo(cm));
+    red.mb.est.forEach(([n,la,ln,l])=>L.circleMarker([la,ln],{pane:"red",radius:2,color:"#c4312b",weight:1,opacity:.3,fillColor:"#fff",fillOpacity:.6}).bindTooltip(`${n} · Metrobús ${l}`).addTo(cb));
+    red.metro.est.forEach(([n,la,ln,l])=>L.circleMarker([la,ln],{pane:"red",radius:3,color:COLOR_METRO[l]||"#888",weight:1.5,opacity:.45,fillColor:"#fff",fillOpacity:.75}).bindTooltip(n,{permanent:true,direction:"right",className:"metro"}).addTo(cm));
   }).catch(e=>console.warn("red",e));
   /* los nombres de estación solo de cerca, para que no se amontonen */
   const nombres=()=>m.getContainer().classList.toggle("sin-nombres",m.getZoom()<14);m.on("zoomend",nombres);nombres();
