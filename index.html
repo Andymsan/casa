@@ -437,7 +437,7 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
       <div class="err" id="loginErr"></div>
       <div class="alt"><button class="lnk" id="btnSignup">Crear cuenta</button><button class="lnk" id="btnReset">Olvidé la contraseña</button></div>
     </div>
-    <div id="pickBox" class="hide"><p>¿Quién eres?</p><div class="elige" id="pickBtns"></div><div class="err" id="pickErr"></div></div>
+    <div id="pickBox" class="hide"><p>¿Quién eres?</p><p class="suave" id="pickEmail" style="font-size:15px;margin-top:-6px"></p><div class="elige" id="pickBtns"></div><div class="err" id="pickErr"></div></div>
     <div id="denyBox" class="hide"><div class="err" id="denyErr" style="margin-bottom:14px"></div><button class="btn linea" id="btnOut2">Salir</button></div>
   </div>
 </div>
@@ -457,6 +457,7 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
     </nav>
     <div class="pie">
       <div class="fila estado pres" id="presPie"></div>
+      <div class="fila estado" id="cuentaEmail" style="font-size:13.5px;color:var(--suave);word-break:break-all"></div>
       <div class="fila estado" id="sync"><i class="punto"></i>en la nube</div>
       <div class="fila"><span class="quien" id="whoName"></span><span class="sp"></span>
         <button onclick="Apariencia.abrir(this)" aria-label="Apariencia" title="Claro u oscuro"><svg class="svgi" style="width:18px;height:18px"><use href="#i-luna"/></svg></button>
@@ -817,6 +818,7 @@ auth.onAuthStateChanged(async u=>{
       try{await ref.miembros.set({...mem,[b.dataset.q]:u.uid});start(b.dataset.q,u)}
       catch(e){$("#pickErr").textContent="No se pudo guardar: "+e.message}
     });
+    $("#pickEmail").innerHTML=`Entraste con ${esc(u.email)}. <button class="lnk" id="pickOut">No soy yo</button>`;$("#pickOut").onclick=()=>auth.signOut();
     showGate("pickBox");
   }catch(e){
     if(e.code==="permission-denied")deny(u.email+" todavía no tiene permiso en Firebase.");
@@ -826,7 +828,8 @@ auth.onAuthStateChanged(async u=>{
 
 async function start(quien,u){
   S.quien=quien;S.email=u.email;
-  $("#whoName").textContent=NOMBRE[quien];
+  $("#whoName").textContent=NOMBRE[quien];$("#whoName").title=u.email;$("#btnOut").title="Salir de "+u.email;
+  $("#cuentaEmail").textContent=u.email;
   $("#gate").classList.add("hide");$("#app").classList.remove("hide");
   await seed();
   await parchar();
