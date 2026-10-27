@@ -1229,13 +1229,17 @@ function sobreHTML(c,mia){
   const x=`<button class="x" data-cx="${c.id}" aria-label="Borrar">×</button>`;
   if(mia){
     const st=c.abierta?`${NOMBRE[c.para]} la abrió ${hace(c.abiertaEn||c.creado)}`:sellada?`Sellada hasta el ${fechaCorta(c.abrirDesde)}`:"Todavía sin abrir";
-    return `<div class="sobre abierta"><div class="texto">${esc(c.texto)}</div><div class="meta"><span>${st}</span><span class="sp"></span>${x}</div></div>`;
+    return `<div class="sobre abierta"><div class="texto">${esc(c._t??"")}</div><div class="meta"><span>${st}</span><span class="sp"></span>${x}</div></div>`;
   }
-  if(c.abierta)return `<div class="sobre abierta" data-id="${c.id}"><div class="texto">${esc(c.texto)}</div><div class="meta"><span>De ${NOMBRE[c.de]}, ${fechaCorta(c.creado)}</span><span class="sp"></span>${x}</div></div>`;
+  if(c.abierta)return `<div class="sobre abierta" data-id="${c.id}"><div class="texto">${esc(c._t??"")}</div><div class="meta"><span>De ${NOMBRE[c.de]}, ${fechaCorta(c.creado)}</span><span class="sp"></span>${x}</div></div>`;
   return `<div class="sobre"><div class="sello"><svg class="svgi"><use href="#i-${icono}"/></svg></div><div class="pie-s"><b>${c.tipo==="regalo"?"Un regalo":"Una cartita"} de ${NOMBRE[c.de]}</b>${sellada?`Se abre el ${fechaCorta(c.abrirDesde)}`:`<button class="btn chico" data-abrir="${c.id}" style="margin-top:8px">Abrirla</button>`}</div></div>`;
 }
-function renderCartas(){
-  if(!S.booted||!S.quien)return;
+let cartasV=0;
+async function renderCartas(){
+  if(!S.booted||!S.quien||!LLAVE)return;
+  /* el texto va cifrado; las viejas que estaban en claro se cifran una vez */
+  const v=++cartasV;await Promise.all(S.cartas.map(async c=>{c._t=c.ct?await descifrar(c):c.texto}));if(v!==cartasV)return;
+  S.cartas.filter(c=>typeof c.texto==="string"&&c.texto).forEach(async c=>ref.cartas.doc(c.id).update({...await cifrar(c.texto),texto:null}));
   const yo=S.quien,ord=(a,b)=>b.creado-a.creado;
   const rec=S.cartas.filter(c=>c.para===yo).sort(ord),env=S.cartas.filter(c=>c.de===yo).sort(ord);
   $("#cRecibidas").innerHTML=rec.map(c=>sobreHTML(c,false)).join("")||`<div class="vacio">Nada todavía.</div>`;
@@ -1259,7 +1263,7 @@ function cartaEvents(){
   $("#cSello").addEventListener("change",e=>{$("#cCuando").classList.toggle("hide",!e.target.checked);if(e.target.checked&&!$("#cCuando").value)$("#cCuando").value=proximoMediodia()});
   $("#cEnviar").onclick=()=>{const t=$("#cTexto").value.trim();if(!t){$("#cTexto").focus();return}
     const cuando=$("#cSello").checked&&$("#cCuando").value?new Date($("#cCuando").value).getTime():null;
-    ref.cartas.doc().set({de:S.quien,para:otro(),texto:t,tipo:S.cTipo,abrirDesde:cuando,abierta:false,creado:Date.now()});
+    if(!LLAVE)return;cifrar(t).then(x=>ref.cartas.doc().set({de:S.quien,para:otro(),...x,tipo:S.cTipo,abrirDesde:cuando,abierta:false,creado:Date.now()}));
     $("#cTexto").value="";$("#cSello").checked=false;$("#cCuando").classList.add("hide")};
   $("#p-cartas").addEventListener("click",e=>{
     const a=e.target.closest("[data-abrir]");if(a){ref.cartas.doc(a.dataset.abrir).update({abierta:true,abiertaEn:Date.now()});setTimeout(()=>{const s=$(`.sobre[data-id="${a.dataset.abrir}"]`);s&&s.classList.add("nueva")},60);return}
