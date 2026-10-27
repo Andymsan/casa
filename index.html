@@ -962,8 +962,9 @@ async function aplicarConfig(raw){
   S.config={...DEFAULT_CONFIG,...raw};
   PRIV.forEach(k=>{if(p&&p[k]!==undefined&&p[k]!==null)S.config[k]=p[k];else if(S.config[k]===null)S.config[k]=DEFAULT_CONFIG[k]});
   if(!Array.isArray(S.config.calendarios))S.config.calendarios=[];
-  else if(!S.config.calendarios.some(c=>c.de===S.quien)&&S.email&&/@gmail\.com$/i.test(S.email))
-    ref.config.set({calendarios:[...S.config.calendarios,{id:S.email,nombre:"Personal",de:S.quien,color:S.quien==="rafa"?"#F4511E":"#0B8043"}]},{merge:true});
+  /* el correo de cada quien se agrega solo una vez; si lo quitan, no vuelve */
+  else if(!(S.config.calAuto||{})[S.quien]&&!S.config.calendarios.some(c=>c.de===S.quien)&&S.email&&/@gmail\.com$/i.test(S.email))
+    ref.config.set({calendarios:[...S.config.calendarios,{id:S.email,nombre:"Personal",de:S.quien,color:S.quien==="rafa"?"#F4511E":"#0B8043"}],calAuto:{...(S.config.calAuto||{}),[S.quien]:true}},{merge:true});
   fillInputs();fillEsc();fillEscA();renderCalc();renderDepas();renderMarkers();renderCal();renderInicio();
   if(S.booted)pintarLlave();
   /* lo que todavía esté sin cifrar en la nube se cifra y se borra */
@@ -1598,7 +1599,7 @@ function calEvents(){
   $("#calSeg").addEventListener("click",e=>{const b=e.target.closest("button");if(b){S.calModo=b.dataset.m;renderCal()}});
   $("#calColores").addEventListener("click",e=>{const b=e.target.closest("button");if(b){S.calColor=b.dataset.c;renderCal()}});
   $("#calList").addEventListener("click",e=>{const b=e.target.closest("[data-calx]");if(!b)return;const c=[...S.config.calendarios],q=c[+b.dataset.calx];
-    if(confirm(`¿Quitar "${q.nombre}" de la página? En Google Calendar no cambia nada.`)){c.splice(+b.dataset.calx,1);ref.config.set({calendarios:c},{merge:true})}});
+    if(confirm(`¿Quitar "${q.nombre}" de la página? En Google Calendar no cambia nada.`)){c.splice(+b.dataset.calx,1);ref.config.set({calendarios:c,calAuto:{...(S.config.calAuto||{}),[q.de]:true}},{merge:true})}});
   /* acepta el ID o el link para compartir de Google (…?cid=base64) */
   const calIdDe=v=>{const m=v.match(/[?&](?:cid|src)=([^&#]+)/);if(!m)return v;const c=decodeURIComponent(m[1]);try{const d=atob(c.replace(/-/g,"+").replace(/_/g,"/"));if(d.includes("@"))return d}catch(e){}return c};
   $("#calAdd").onclick=()=>{const id=calIdDe($("#calId").value.trim());if(!id)return;
