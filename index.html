@@ -545,6 +545,7 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
     <div class="cab"><div><h2>El mapa</h2></div></div>
     <div class="capas" id="mapaBtns">
       <span class="cap">Andrea en</span><button class="pill" data-lugarA="semarnat">SEMARNAT</button><button class="pill" data-lugarA="otro">Otro</button>
+      <span class="cap">Rafa en</span><button class="pill" data-lugar="herdez">Herdez</button><button class="pill" data-lugar="otro">Otro</button>
       <span class="cap">Ver</span><button class="pill" data-capa="metro">Metro</button><button class="pill" data-capa="mb">Metrobús</button>
     </div>
     <div id="mapa"></div>
@@ -574,6 +575,7 @@ dialog h3{font-size:35.8px;font-style:italic;font-weight:400;margin-bottom:16px}
         <div class="fl"><span>Nombre</span><input type="text" id="escNom" placeholder="Trabajo actual"></div>
         <div class="fl"><span>Neto al mes</span><div class="money"><input type="number" min="0" step="100" id="escNeto"></div></div>
         <div class="fl"><span>Vales</span><div class="money"><input type="number" min="0" step="100" id="escVales"></div></div>
+        <div class="fl"><span>Trabaja en</span><select id="escLugar"><option value="herdez">Herdez</option><option value="otro">Otro lugar, por definir</option></select></div>
         <label class="chk"><input type="checkbox" data-k="contarVales"> Contar los vales</label>
         <button class="lnk" id="escDel" style="margin-bottom:4px">Quitar esta opción</button>
         <h4>Renta</h4>
@@ -1021,6 +1023,7 @@ function ingresoR(e){return (+e.neto||0)+(S.config.contarVales?(+e.vales||0):0)}
 function escsA(){const c=S.config;return Array.isArray(c.escAndrea)&&c.escAndrea.length?c.escAndrea:[{id:"a1",nombre:"SEMARNAT",neto:+c.ingA||0,lugar:"semarnat"}]}
 function escActualA(){const l=escsA();return l.find(e=>e.id===S.config.escActivoA)||l[0]}
 function lugarA(e){return e.lugar||"semarnat"}
+function lugarR(e){return e.lugar==="otro"?"otro":"herdez"}
 function ingresos(){return {a:+escActualA().neto||0,r:ingresoR(escActual())}}
 function shares(){
   const {a,r}=ingresos();
@@ -1379,7 +1382,7 @@ function renderCalc(){
 
 /* ---------- Opciones de Rafa ---------- */
 let escT=null;
-/* Rafa trabaja en Herdez; las opciones de aquí son solo de ingreso */
+/* Rafa trabaja en Herdez; "Otro" queda por si cambia */
 function depasOpc(){return S.depas}
 /* una sola vez: se quitan las opciones de Rafa que eran de Fermic */
 function quitarFermic(){
@@ -1395,6 +1398,8 @@ function quitarFermic(){
 }
 function pintarLugares(){
   if(!LUGARES.herdez||!LUGARES.semarnat)return;pintarZona();
+  const lr=lugarR(escActual());$$("[data-lugar]").forEach(b=>b.classList.toggle("on",b.dataset.lugar===lr));
+  LUGARES.herdez.setStyle({opacity:lr==="herdez"?1:.35,fillOpacity:lr==="herdez"?1:.35});
   const la=lugarA(escActualA());$$("[data-lugarA]").forEach(b=>b.classList.toggle("on",b.dataset.lugara===la));
   LUGARES.semarnat.setStyle({opacity:la==="semarnat"?1:.35,fillOpacity:la==="semarnat"?1:.35});
 }
@@ -1402,6 +1407,7 @@ function fillEsc(){
   const l=escs(),a=escActual();
   $("#escs").innerHTML=l.map(e=>`<button class="pill ${e.id===a.id?"on":""}" data-e="${e.id}">${esc(e.nombre||"Sin nombre")}</button>`).join("")+`<button class="pill" data-e="nuevo">+ Otra opción</button>`;
   [["#escNom","nombre"],["#escNeto","neto"],["#escVales","vales"]].forEach(([q,k])=>{const i=$(q);if(i!==document.activeElement)i.value=k==="nombre"?(a[k]||""):(+a[k]||"")});
+  $("#escLugar").value=lugarR(a);
   $("#escDel").classList.toggle("hide",l.length<2);
   pintarLugares();
 }
@@ -1431,6 +1437,10 @@ function escEventsA(){
   $("#escALugar").addEventListener("change",ev=>{const a=escActualA();guardarEscA(escsA().map(e=>e.id===a.id?{...e,lugar:ev.target.value}:e),a.id)});
   $("#escADel").onclick=()=>{const a=escActualA();if(!confirm(`¿Quitar la opción "${a.nombre||"sin nombre"}"?`))return;const l=escsA().filter(e=>e.id!==a.id);guardarEscA(l,l[0].id)};
 }
+function elegirLugar(k){
+  const o=escs().find(x=>lugarR(x)===k);if(o){if(o.id!==escActual().id)guardarEsc(escs(),o.id);return}
+  const a=escActual(),id="e"+Date.now();guardarEsc([...escs(),{id,nombre:k==="otro"?"Otro trabajo":"Herdez",neto:+a.neto||0,vales:+a.vales||0,lugar:k}],id);
+}
 function guardarEsc(l,activo){
   S.config.escRafa=l;S.config.escActivo=activo;const a=escActual();S.config.ingR=+a.neto||0;S.config.valesR=+a.vales||0;
   fillEsc();renderCalc();renderDepas();renderMarkers();renderInicio();
@@ -1438,10 +1448,11 @@ function guardarEsc(l,activo){
 }
 function escEvents(){
   $("#escs").addEventListener("click",e=>{const b=e.target.closest("[data-e]");if(!b)return;
-    if(b.dataset.e==="nuevo"){const id="e"+Date.now();guardarEsc([...escs(),{id,nombre:"",neto:0,vales:0}],id);$("#escNom").focus()}
+    if(b.dataset.e==="nuevo"){const id="e"+Date.now();guardarEsc([...escs(),{id,nombre:"",neto:+escActual().neto||0,vales:+escActual().vales||0,lugar:"otro"}],id);$("#escNom").focus()}
     else guardarEsc(escs(),b.dataset.e)});
   [["#escNom","nombre"],["#escNeto","neto"],["#escVales","vales"]].forEach(([q,k])=>$(q).addEventListener("input",ev=>{
     const a=escActual(),l=escs().map(e=>e.id===a.id?{...e,[k]:k==="nombre"?ev.target.value:(+ev.target.value||0)}:e);guardarEsc(l,a.id)}));
+  $("#escLugar").addEventListener("change",ev=>{const a=escActual();guardarEsc(escs().map(e=>e.id===a.id?{...e,lugar:ev.target.value}:e),a.id)});
   $("#escDel").onclick=()=>{const a=escActual();if(!confirm(`¿Quitar la opción "${a.nombre||"sin nombre"}"?`))return;const l=escs().filter(e=>e.id!==a.id);guardarEsc(l,l[0].id)};
 }
 
@@ -1684,7 +1695,7 @@ function pintarZona(){
   /* si el mapa está oculto, se encuadra al abrirlo */
   zonaLayer._lugar=lu;if($("#p-mapa").classList.contains("on"))verZona();else map._ajustado=0;
 }
-function verZona(){if(zonaLayer)map.fitBounds(zonaLayer.getBounds(),{padding:[40,40]})}
+function verZona(){if(!zonaLayer)return;const b=zonaLayer.getBounds();["semarnat","herdez"].forEach(k=>LUGARES[k]&&b.extend(LUGARES[k].getLatLng()));map.fitBounds(b,{padding:[40,40]})}
 /* Red oficial de Metro y Metrobús (datos abiertos CDMX), en red.json */
 const COLOR_METRO={"1":"#e9468f","2":"#0065b3","3":"#b0a32a","4":"#6fb7ae","5":"#f5c400","6":"#d81e05","7":"#e87511","8":"#118749","9":"#5b352e","A":"#9e1a81","B":"#7a8a70","12":"#b99e51"};
 let redP=null;const CAPAS={metro:true,mb:false},capaLayer={};
@@ -1717,7 +1728,8 @@ function buildMap(){
 function lugaresEvents(){
   $("#mapaBtns").addEventListener("click",e=>{
     const c=e.target.closest("[data-capa]");if(c){CAPAS[c.dataset.capa]=!CAPAS[c.dataset.capa];pintarCapas();return}
-    const ba=e.target.closest("[data-lugarA]");if(ba)elegirLugarA(ba.dataset.lugara)});
+    const ba=e.target.closest("[data-lugarA]");if(ba){elegirLugarA(ba.dataset.lugara);return}
+    const b=e.target.closest("[data-lugar]");if(b)elegirLugar(b.dataset.lugar)});
 }
 function renderMarkers(){
   if(!depaLayer)return;depaLayer.clearLayers();markers={};
